@@ -59,8 +59,10 @@ const filteredEvents = computed(() => {
 // 按日期排序的事件列表（用於顯示即將到來的事件）
 const sortedEvents = computed(() => {
   return [...filteredEvents.value].sort((a, b) => {
-    const dateA = new Date(a.date + ' ' + a.time)
-    const dateB = new Date(b.date + ' ' + b.time)
+    const timeA = a.time || '00:00'
+    const timeB = b.time || '00:00'
+    const dateA = new Date(`${a.date}T${timeA}`)
+    const dateB = new Date(`${b.date}T${timeB}`)
     return dateA - dateB
   })
 })
@@ -69,7 +71,10 @@ const sortedEvents = computed(() => {
 const upcomingEvents = computed(() => {
   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0)
   return sortedEvents.value.filter(event => {
-    const eventDate = new Date(event.date + ' ' + (event.time || '00:00'))
+    const time = event.time || '00:00'
+    // Handle potential date format issues
+    const dateStr = event.date.includes('T') ? event.date.split('T')[0] : event.date
+    const eventDate = new Date(`${dateStr}T${time}`)
     return eventDate >= todayStart
   })
 })
@@ -94,7 +99,25 @@ const generateCalendarDays = () => {
   // 填充實際日期
   for (let day = 1; day <= daysInMonth; day++) {
     const dayEvents = filteredEvents.value.filter(event => {
-      const [eYear, eMonth, eDay] = event.date.split('-').map(Number)
+      if (!event.date) return false
+      
+      // Robust date parsing
+      let eYear, eMonth, eDay
+      
+      if (event.date.includes('T')) {
+        // Handle ISO string
+        const d = new Date(event.date)
+        eYear = d.getFullYear()
+        eMonth = d.getMonth() + 1
+        eDay = d.getDate()
+      } else {
+        // Handle YYYY-MM-DD string
+        const parts = event.date.split('-').map(Number)
+        eYear = parts[0]
+        eMonth = parts[1]
+        eDay = parts[2]
+      }
+      
       return eYear === year && eMonth === (month + 1) && eDay === day
     })
     days.push({ day, events: dayEvents })

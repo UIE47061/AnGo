@@ -47,7 +47,9 @@ onMounted(async () => {
 
 const fetchEvents = async (year, month) => {
   try {
+    console.log('[CalendarPage] Fetching events for:', year, month)
     const events = await calendarApi.getEvents(roomId.value, year, month)
+    console.log('[CalendarPage] Fetched events:', events)
     calendarEvents.value = events
   } catch (error) {
     console.error('Failed to fetch events:', error)
