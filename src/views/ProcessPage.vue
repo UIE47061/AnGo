@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import BottomNav from '@/components/BottomNav.vue'
 import { dashboardApi } from '@/api/dashboard'
+import { servicesApi } from '@/api/services'
 
 const router = useRouter()
 
@@ -16,11 +17,25 @@ onMounted(async () => {
   try {
     const roomId = localStorage.getItem('roomId')
     if (roomId) {
+      // 1. Get Room Info
       const res = await dashboardApi.getDashboardData(roomId)
       shareCode.value = res.room.roomCode
+
+      // 2. Get Assigned Services
+      const services = await servicesApi.getServices(roomId)
+      
+      // Update process steps with assigned services
+      services.forEach(service => {
+        const step = processSteps.value.find(s => s.id === service.processId)
+        if (step) {
+          step.assignedTo = service.providerName
+          step.assignType = 'vendor'
+          // You might want to update status based on service.status if needed
+        }
+      })
     }
   } catch (error) {
-    console.error('Failed to fetch room info:', error)
+    console.error('Failed to fetch data:', error)
   }
 })
 

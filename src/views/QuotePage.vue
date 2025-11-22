@@ -258,29 +258,43 @@ const toggleCart = () => {
   isCartExpanded.value = !isCartExpanded.value
 }
 
+import { servicesApi } from '@/api/services'
+
+// ...existing code...
+
 // 確認服務
-const confirmServices = () => {
+const confirmServices = async () => {
   if (totalSelectedServices.value === 0) {
     alert('請先選擇服務項目')
     return
   }
   
-  // 儲存到 localStorage 以便流程頁面讀取
+  const roomId = localStorage.getItem('roomId')
+  if (!roomId) {
+    alert('請先登入或加入房間')
+    return
+  }
+
+  // 準備資料
   const servicesData = []
   selectedServices.value.forEach((serviceSet, companyId) => {
     const company = companies.value.find(c => c.id === companyId)
     serviceSet.forEach(serviceId => {
       servicesData.push({
         processId: serviceId,
-        companyName: company.name
+        providerName: company.name
       })
     })
   })
   
-  localStorage.setItem('assignedServices', JSON.stringify(servicesData))
-  
-  alert(`已確認 ${totalSelectedServices.value} 項服務，即將返回流程頁面`)
-  router.push({ name: 'Process' })
+  try {
+    await servicesApi.updateServices(roomId, servicesData)
+    alert(`已確認 ${totalSelectedServices.value} 項服務，即將返回流程頁面`)
+    router.push({ name: 'Process' })
+  } catch (error) {
+    console.error(error)
+    alert('儲存服務失敗，請稍後再試')
+  }
 }
 </script>
 
