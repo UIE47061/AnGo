@@ -32,6 +32,67 @@ export const chatApi = {
   },
 
   /**
+   * 發送 AI 串流訊息
+   * @param {string} message
+   * @param {function} onChunk - 接收到數據塊時的回調函數
+   * @param {function} onDone - 完成時的回調函數
+   * @param {function} onError - 發生錯誤時的回調函數
+   */
+  async streamAiMessage(message, onChunk, onDone, onError) {
+    try {
+      const baseURL = client.defaults.baseURL
+      const token = localStorage.getItem('token')
+      
+      const response = await fetch(`${baseURL}/ai/chat/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({ 
+          message,
+          systemPrompt: '你是安行助理，請使用繁體中文回答所有問題。'
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+
+      while (true) {
+        const { value, done } = await reader.read()
+        if (done) break
+        
+        const chunk = decoder.decode(value, { stream: true })
+        const lines = chunk.split('\n')
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            if (data === '[DONE]') {
+              if (onDone) onDone()
+              return
+            }
+            try {
+              const parsed = JSON.parse(data)
+              if (parsed.content && onChunk) {
+                onChunk(parsed.content)
+              }
+            } catch (e) {
+              console.warn('Failed to parse chunk:', e)
+            }
+          }
+        }
+      }
+    } catch (error) {
+      if (onError) onError(error)
+    }
+  },
+
+  /**
    * 快速查詢
    * @param {string} query - document_status | payment_status
    */

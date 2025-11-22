@@ -27,23 +27,42 @@ const sendMessage = async () => {
   messageInput.value = ''
   isLoading.value = true
 
+  // Create a placeholder for the bot response
+  const botMsgId = Date.now() + 1
+  chatMessages.value.push({
+    id: botMsgId,
+    type: 'bot',
+    text: ''
+  })
+
   try {
-    const res = await chatApi.sendAiMessage(text)
-    chatMessages.value.push({
-      id: Date.now() + 1,
-      type: 'bot',
-      text: res.reply
-    })
+    await chatApi.streamAiMessage(
+      text,
+      (chunk) => {
+        // onChunk: append text to the last message
+        const msgIndex = chatMessages.value.findIndex(m => m.id === botMsgId)
+        if (msgIndex !== -1) {
+          chatMessages.value[msgIndex].text += chunk
+          scrollToBottom()
+        }
+      },
+      () => {
+        // onDone
+        isLoading.value = false
+      },
+      (error) => {
+        // onError
+        console.error(error)
+        const msgIndex = chatMessages.value.findIndex(m => m.id === botMsgId)
+        if (msgIndex !== -1) {
+          chatMessages.value[msgIndex].text = '抱歉，我現在無法回答您的問題，請稍後再試。'
+        }
+        isLoading.value = false
+      }
+    )
   } catch (error) {
     console.error(error)
-    chatMessages.value.push({
-      id: Date.now() + 1,
-      type: 'bot',
-      text: '抱歉，我現在無法回答您的問題，請稍後再試。'
-    })
-  } finally {
     isLoading.value = false
-    scrollToBottom()
   }
 }
 
@@ -68,14 +87,39 @@ const quickSend = async (text) => {
         type: 'bot',
         text: res.reply
       })
+      isLoading.value = false
+      scrollToBottom()
     } else {
       // Fallback to normal chat if not a quick query
-      const res = await chatApi.sendAiMessage(text)
+      // Create a placeholder for the bot response
+      const botMsgId = Date.now() + 1
       chatMessages.value.push({
-        id: Date.now() + 1,
+        id: botMsgId,
         type: 'bot',
-        text: res.reply
+        text: ''
       })
+
+      await chatApi.streamAiMessage(
+        text,
+        (chunk) => {
+          const msgIndex = chatMessages.value.findIndex(m => m.id === botMsgId)
+          if (msgIndex !== -1) {
+            chatMessages.value[msgIndex].text += chunk
+            scrollToBottom()
+          }
+        },
+        () => {
+          isLoading.value = false
+        },
+        (error) => {
+          console.error(error)
+          const msgIndex = chatMessages.value.findIndex(m => m.id === botMsgId)
+          if (msgIndex !== -1) {
+            chatMessages.value[msgIndex].text = '抱歉，查詢失敗，請稍後再試。'
+          }
+          isLoading.value = false
+        }
+      )
     }
   } catch (error) {
     console.error(error)
@@ -84,7 +128,6 @@ const quickSend = async (text) => {
       type: 'bot',
       text: '抱歉，查詢失敗，請稍後再試。'
     })
-  } finally {
     isLoading.value = false
     scrollToBottom()
   }
