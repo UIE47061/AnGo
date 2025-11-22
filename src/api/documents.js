@@ -3,10 +3,11 @@ import client from './client'
 export const documentsApi = {
   /**
    * 獲取文件列表
+   * @param {string} familyId
    * @param {string} [status] - 全部 | 已審核 | 待補件 | 尚未上傳
    */
-  getDocuments(status) {
-    return client.get('/documents', {
+  getDocuments(familyId, status) {
+    return client.get(`/documents/${familyId}`, {
       params: { status }
     })
   },

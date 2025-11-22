@@ -3,9 +3,10 @@ import client from './client'
 export const dashboardApi = {
   /**
    * 獲取儀表板資訊
+   * @param {string} familyId
    */
-  getDashboardData() {
-    return client.get('/dashboard')
+  getDashboardData(familyId) {
+    return client.get(`/dashboard/${familyId}`)
   },
 
   /**
