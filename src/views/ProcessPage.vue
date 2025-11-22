@@ -384,7 +384,12 @@ const updateStepStatus = async (step, newStatus) => {
               
               <!-- 負責人資訊 -->
               <div class="assign-info">
-                <div v-if="step.assignedTo" class="assign-badge" :style="getAssignBadgeStyle(step.assignType)">
+                <div 
+                  v-if="step.assignedTo" 
+                  class="assign-badge clickable" 
+                  :style="getAssignBadgeStyle(step.assignType)"
+                  @click.stop="openAssignDialog(step)"
+                >
                   <svg v-if="step.assignType === 'vendor'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
@@ -394,6 +399,10 @@ const updateStepStatus = async (step, newStatus) => {
                     <circle cx="8.5" cy="7" r="4" />
                   </svg>
                   <span>{{ step.assignType === 'vendor' ? '業者' : '自辦' }}：{{ step.assignedTo }}</span>
+                  <svg class="edit-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
                 </div>
                 <button v-else class="unassigned-badge" @click.stop="openAssignDialog(step)">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
@@ -784,14 +793,25 @@ const updateStepStatus = async (step, newStatus) => {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.5rem;
   font-size: 0.85rem;
   font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.assign-badge svg {
-  flex-shrink: 0;
+.assign-badge.clickable {
+  cursor: pointer;
+}
+
+.assign-badge.clickable:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+}
+
+.edit-icon {
+  margin-left: 0.2rem;
+  opacity: 0.6;
 }
 
 .unassigned-badge {
