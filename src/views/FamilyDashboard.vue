@@ -1,9 +1,50 @@
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ProgressCircle from '@/components/ProgressCircle.vue'
 import BottomNav from '@/components/BottomNav.vue'
+import Calendar from '@/components/Calendar.vue'
 
 const router = useRouter()
+
+// 日曆事件資料（後端 API 格式）
+const calendarEvents = ref([
+  {
+    id: 1,
+    date: '2025-11-20',
+    time: '14:00',
+    title: '誦經法事',
+    category: '禮儀'
+  },
+  {
+    id: 2,
+    date: '2025-11-25',
+    time: '09:00',
+    title: '文件補件截止',
+    category: '行政'
+  },
+  {
+    id: 3,
+    date: '2025-11-27',
+    time: '10:30',
+    title: '家屬會議',
+    category: '行政'
+  },
+  {
+    id: 4,
+    date: '2025-11-20',
+    time: '16:00',
+    title: '場地佈置確認',
+    category: '禮儀'
+  },
+  {
+    id: 5,
+    date: '2025-11-30',
+    time: '11:00',
+    title: '最終審核',
+    category: '行政'
+  }
+])
 
 const navigateToQuote = () => {
   router.push({ name: 'Quote' })
@@ -118,56 +159,10 @@ const navigateToPayment = () => {
       <!-- 提醒 + 行事曆 -->
       <section class="calendar-section">
         <div class="reminder-bar">
-          <span>2/25 為補件截止日，是否幫您設提醒？</span>
+          <span>11/25 為補件截止日，是否幫您設提醒？</span>
         </div>
 
-        <div class="calendar-card">
-          <div class="calendar-header">
-            <span>February 2021</span>
-            <div class="nav">
-              <button>&lt;</button>
-              <button>&gt;</button>
-            </div>
-          </div>
-
-          <div class="calendar-grid">
-            <div class="week-row header">
-              <span>Mo</span>
-              <span>Tu</span>
-              <span>We</span>
-              <span>Th</span>
-              <span>Fr</span>
-              <span>Sa</span>
-              <span>Su</span>
-            </div>
-
-            <div class="week-row">
-              <span></span><span>1</span><span>2</span><span>3</span><span>4</span>
-              <span>5</span><span>6</span>
-            </div>
-            <div class="week-row">
-              <span>7</span><span>8</span><span>9</span><span>10</span>
-              <span>11</span><span>12</span><span>13</span>
-            </div>
-            <div class="week-row">
-              <span>14</span><span>15</span><span>16</span><span>17</span>
-              <span>18</span><span>19</span><span>20</span>
-            </div>
-            <div class="week-row">
-              <span>21</span>
-              <span class="pill active">23</span>
-              <span>24</span>
-              <span class="pill range">25</span>
-              <span class="pill range">26</span>
-              <span class="pill active">27</span>
-              <span>28</span>
-            </div>
-            <div class="week-row fade">
-              <span>1</span><span>2</span><span>3</span><span>4</span>
-              <span>5</span><span></span><span></span>
-            </div>
-          </div>
-        </div>
+        <Calendar :events="calendarEvents" />
       </section>
     </main>
 
@@ -429,77 +424,5 @@ const navigateToPayment = () => {
   color: #fff;
   font-size: 0.85rem;
   box-shadow: 0 8px 14px rgba(159, 53, 255, 0.32);
-}
-
-.calendar-card {
-  border-radius: 1.5rem;
-  background: #ffffff;
-  padding: 1.2rem 1.3rem 1.4rem;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
-}
-
-.calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.9rem;
-  font-weight: 600;
-  color: #2b2b3a;
-}
-
-.calendar-header .nav {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.calendar-header .nav button {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 0.1rem 0.4rem;
-  font-size: 1rem;
-  color: #2b2b3a;
-}
-
-.calendar-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.85rem;
-}
-
-.week-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
-  gap: 0.1rem;
-}
-
-.week-row.header {
-  color: #9a9ab0;
-  font-size: 0.75rem;
-}
-
-.week-row span {
-  padding: 0.25rem 0;
-}
-
-.pill {
-  border-radius: 999px;
-  padding: 0.25rem 0;
-}
-
-.pill.active {
-  background: #5c3fe1;
-  color: #fff;
-}
-
-.pill.range {
-  background: rgba(92, 63, 225, 0.13);
-  color: #5c3fe1;
-}
-
-.week-row.fade span {
-  color: #d0d0dd;
 }
 </style>
