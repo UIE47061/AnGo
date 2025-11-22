@@ -1,8 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
+import BottomNav from '@/components/BottomNav.vue'
 
 const companies = ref([
   {
@@ -95,10 +93,6 @@ const formatPrice = (price) => {
   return `NT$${price.toLocaleString()}`
 }
 
-const goBack = () => {
-  router.back()
-}
-
 const toggleCompare = (companyId) => {
   if (compareSet.value.has(companyId)) {
     compareSet.value.delete(companyId)
@@ -140,7 +134,6 @@ const selectedCompanies = () => {
       <!-- 頂部 Bar：標題 + 篩選 -->
       <header class="top-bar">
         <div class="header-row">
-          <button @click="goBack" class="back-btn">&lt;</button>
           <h3>報價列表</h3>
         </div>
         
@@ -286,6 +279,8 @@ const selectedCompanies = () => {
         </div>
       </div>
     </div>
+
+    <BottomNav />
   </div>
 </template>
 

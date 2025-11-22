@@ -33,6 +33,11 @@ const routes = [
     component: () => import('@/views/CalendarPage.vue'),
   },
   {
+    path: '/process',
+    name: 'Process',
+    component: () => import('@/views/ProcessPage.vue'),
+  },
+  {
     path: '/quote',
     name: 'Quote',
     component: () => import('@/views/QuotePage.vue'),

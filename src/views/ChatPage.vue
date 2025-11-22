@@ -1,8 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import BottomNav from '@/components/BottomNav.vue'
 
-const router = useRouter()
 const messageInput = ref('')
 const chatMessages = ref([
   {
@@ -11,10 +10,6 @@ const chatMessages = ref([
     text: '您好！我是安行助理'
   }
 ])
-
-const goBack = () => {
-  router.back()
-}
 
 const sendMessage = () => {
   const text = messageInput.value.trim()
@@ -49,8 +44,7 @@ const quickSend = (text) => {
   <div class="phone">
     <div class="chat-page">
       <header>
-        <button @click="goBack" class="back-btn">&lt;</button>
-        <h3>對話</h3>
+        <h3>AI對話</h3>
       </header>
 
       <div class="chat-scroll" id="chat-scroll">
