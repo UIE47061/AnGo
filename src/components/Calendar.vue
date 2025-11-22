@@ -79,6 +79,17 @@ const upcomingEvents = computed(() => {
   })
 })
 
+// 過去的事件
+const pastEvents = computed(() => {
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0)
+  return sortedEvents.value.filter(event => {
+    const time = event.time || '00:00'
+    const dateStr = event.date.includes('T') ? event.date.split('T')[0] : event.date
+    const eventDate = new Date(`${dateStr}T${time}`)
+    return eventDate < todayStart
+  }).reverse() // 最近的過去事件在前
+})
+
 // 生成日曆格子
 const generateCalendarDays = () => {
   const days = []
