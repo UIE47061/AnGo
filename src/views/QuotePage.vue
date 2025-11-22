@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -9,7 +9,7 @@ const companies = ref([
     id: 1,
     name: '永恆禮儀',
     rating: 4.8,
-    price: 'NT$28,500',
+    price: 28500,
     religion: '佛教',
     features: ['24h支援', '接送服務'],
     details: '永恆禮儀提供24小時客服，專業法事協調，含接送及場地佈置。'
@@ -18,7 +18,7 @@ const companies = ref([
     id: 2,
     name: '安和殯葬',
     rating: 4.5,
-    price: 'NT$22,000',
+    price: 22000,
     religion: '道教',
     features: ['代辦文件', '佛事協調'],
     details: '安和殯葬擅長代辦公家機關文件，並提供道教法事協調服務。'
@@ -27,16 +27,73 @@ const companies = ref([
     id: 3,
     name: '善念禮儀',
     rating: 4.2,
-    price: 'NT$19,800',
+    price: 19800,
     religion: '無宗教/通用',
     features: ['簡約方案', '線上諮詢'],
     details: '善念以簡約方案著稱，並有線上諮詢與彈性方案可選。'
+  },
+  {
+    id: 4,
+    name: '慈恩禮儀',
+    rating: 4.6,
+    price: 25000,
+    religion: '佛教',
+    features: ['環保葬', '客製化'],
+    details: '慈恩禮儀專注於環保自然葬，提供客製化服務方案。'
+  },
+  {
+    id: 5,
+    name: '福安殯儀',
+    rating: 4.3,
+    price: 32000,
+    religion: '道教',
+    features: ['傳統儀式', '場地租借'],
+    details: '福安殯儀擅長傳統道教儀式，提供完整場地租借服務。'
   }
 ])
 
 const compareSet = ref(new Set())
 const showDetail = ref(null)
 const showCompareView = ref(false)
+
+// 篩選條件
+const filterReligion = ref('全部')
+const filterPriceRange = ref('全部')
+const filterRating = ref('全部')
+
+const religionOptions = ['全部', '佛教', '道教', '無宗教/通用']
+const priceRangeOptions = ['全部', '2萬以下', '2-3萬', '3萬以上']
+const ratingOptions = ['全部', '4.5分以上', '4.0分以上']
+
+// 篩選後的公司列表
+const filteredCompanies = computed(() => {
+  return companies.value.filter(company => {
+    // 宗教篩選
+    if (filterReligion.value !== '全部' && company.religion !== filterReligion.value) {
+      return false
+    }
+    
+    // 價格篩選
+    if (filterPriceRange.value !== '全部') {
+      if (filterPriceRange.value === '2萬以下' && company.price >= 20000) return false
+      if (filterPriceRange.value === '2-3萬' && (company.price < 20000 || company.price >= 30000)) return false
+      if (filterPriceRange.value === '3萬以上' && company.price < 30000) return false
+    }
+    
+    // 評分篩選
+    if (filterRating.value !== '全部') {
+      if (filterRating.value === '4.5分以上' && company.rating < 4.5) return false
+      if (filterRating.value === '4.0分以上' && company.rating < 4.0) return false
+    }
+    
+    return true
+  })
+})
+
+// 格式化價格顯示
+const formatPrice = (price) => {
+  return `NT$${price.toLocaleString()}`
+}
 
 const goBack = () => {
   router.back()
@@ -80,14 +137,52 @@ const selectedCompanies = () => {
 <template>
   <div class="phone">
     <div class="list-page">
-      <header>
-        <button @click="goBack" class="back-btn">&lt;</button>
-        <h3>報價列表</h3>
+      <!-- 頂部 Bar：標題 + 篩選 -->
+      <header class="top-bar">
+        <div class="header-row">
+          <button @click="goBack" class="back-btn">&lt;</button>
+          <h3>報價列表</h3>
+        </div>
+        
+        <!-- 篩選區 -->
+        <div class="filter-section">
+          <div class="filter-group">
+            <label>宗教</label>
+            <select v-model="filterReligion" class="filter-select">
+              <option v-for="option in religionOptions" :key="option" :value="option">
+                {{ option }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>價格</label>
+            <select v-model="filterPriceRange" class="filter-select">
+              <option v-for="option in priceRangeOptions" :key="option" :value="option">
+                {{ option }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>評分</label>
+            <select v-model="filterRating" class="filter-select">
+              <option v-for="option in ratingOptions" :key="option" :value="option">
+                {{ option }}
+              </option>
+            </select>
+          </div>
+        </div>
       </header>
+
+      <!-- 結果數量 -->
+      <div class="result-count">
+        找到 {{ filteredCompanies.length }} 家廠商
+      </div>
 
       <div class="company-list">
         <div
-          v-for="company in companies"
+          v-for="company in filteredCompanies"
           :key="company.id"
           class="company-card"
         >
@@ -97,7 +192,7 @@ const selectedCompanies = () => {
               <div class="company-meta">
                 <span>評價 {{ company.rating }}</span>
                 <span>•</span>
-                <span>{{ company.price }}</span>
+                <span>{{ formatPrice(company.price) }}</span>
               </div>
               <div class="company-features">
                 {{ company.features.join(' · ') }}
@@ -139,7 +234,7 @@ const selectedCompanies = () => {
         <div class="detail-meta">
           <div>評價：{{ showDetail.rating }}</div>
           <div>｜</div>
-          <div>價格：{{ showDetail.price }}</div>
+          <div>價格：{{ formatPrice(showDetail.price) }}</div>
           <div>｜</div>
           <div>宗教：{{ showDetail.religion }}</div>
         </div>
@@ -222,7 +317,19 @@ const selectedCompanies = () => {
   position: relative;
 }
 
-header {
+/* 頂部 Bar */
+.top-bar {
+  background: #fff;
+  padding: 12px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin: -1.8rem -1.5rem 0;
+  padding: 1rem 1.5rem 1.2rem;
+}
+
+.header-row {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -231,21 +338,73 @@ header {
 
 .back-btn {
   border: none;
-  background: #fff;
-  padding: 8px 14px;
+  background: transparent;
+  padding: 8px;
   min-height: 44px;
   min-width: 44px;
-  border-radius: 8px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   font-size: 1.2rem;
+  color: #2b2b3a;
   touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-header h3 {
+.back-btn:active {
+  opacity: 0.6;
+}
+
+.top-bar h3 {
   margin: 0;
   font-size: 1.1rem;
   color: #2b2b3a;
+  flex: 1;
+}
+
+/* 篩選區 */
+.filter-section {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-group label {
+  font-size: 0.75rem;
+  color: #9a9ab0;
+  font-weight: 500;
+}
+
+.filter-select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #2b2b3a;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 36px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #9F35FF;
+  box-shadow: 0 0 0 3px rgba(159, 53, 255, 0.1);
+}
+
+/* 結果數量 */
+.result-count {
+  font-size: 0.85rem;
+  color: #6b6b80;
+  padding: 12px 4px 8px;
 }
 
 .company-list {
