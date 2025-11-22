@@ -5,6 +5,8 @@ import BottomNav from '@/components/BottomNav.vue'
 import Toast from '@/components/Toast.vue'
 import { useToast } from '@/composables/useToast'
 import { dashboardApi } from '@/api/dashboard'
+import { servicesApi } from '@/api/services'
+import { roomsApi } from '@/api/rooms'
 
 const router = useRouter()
 const { displayToast } = useToast()
@@ -17,11 +19,38 @@ onMounted(async () => {
   try {
     const roomId = localStorage.getItem('roomId')
     if (roomId) {
+      // 1. Get Room Info
       const res = await dashboardApi.getDashboardData(roomId)
       shareCode.value = res.room.roomCode
+
+      // 2. Get Room Members
+      const members = await roomsApi.getMembers(roomId)
+      familyMembers.value = members.map(m => ({
+        id: m.id,
+        name: m.name,
+        role: m.role === 'family_member' ? '家屬' : m.role,
+        isOwner: false // TODO: Determine owner
+      }))
+
+      // 3. Get Assigned Services
+      const services = await servicesApi.getServices(roomId)
+      
+      // Update process steps with assigned services
+      services.forEach(service => {
+        const step = processSteps.value.find(s => s.id === service.processId)
+        if (step) {
+          step.assignedTo = service.providerName
+          // Map backend 'family' to frontend 'self' for styling, or update styling
+          step.assignType = service.assignType === 'family' ? 'self' : 'vendor'
+          step.assignedUserId = service.assignedUserId
+          if (service.status) {
+            step.status = service.status
+          }
+        }
+      })
     }
   } catch (error) {
-    console.error('Failed to fetch room info:', error)
+    console.error('Failed to fetch data:', error)
   }
 })
 
@@ -219,12 +248,30 @@ const assignToVendor = () => {
   router.push({ name: 'Quote' })
 }
 
-const assignToFamily = (member) => {
+const assignToFamily = async (member) => {
   if (assigningStep.value) {
     assigningStep.value.assignedTo = member.name
     assigningStep.value.assignType = 'self'
     closeAssignDialog()
     displayToast(`已分配給 ${member.name}`)
+    try {
+      const roomId = localStorage.getItem('roomId')
+      await servicesApi.assignService(roomId, {
+        processId: assigningStep.value.id,
+        providerName: member.name,
+        assignType: 'family',
+        assignedUserId: member.id
+      })
+
+      assigningStep.value.assignedTo = member.name
+      assigningStep.value.assignType = 'self'
+      assigningStep.value.assignedUserId = member.id
+      closeAssignDialog()
+      displayToast(`已分配給 ${member.name}`)
+    } catch (error) {
+      console.error('Assign failed:', error)
+      displayToast('分配失敗')
+    }
   }
 }
 

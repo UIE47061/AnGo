@@ -1,7 +1,13 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Calendar from '@/components/Calendar.vue'
 import BottomNav from '@/components/BottomNav.vue'
+import { calendarApi } from '@/api/calendar'
+import { roomsApi } from '@/api/rooms'
+
+const router = useRouter()
+const roomId = ref(localStorage.getItem('roomId'))
 import Toast from '@/components/Toast.vue'
 import { useToast } from '@/composables/useToast'
 import { dashboardApi } from '@/api/dashboard'
@@ -22,51 +28,40 @@ const newEvent = ref({
   participants: []
 })
 
-// 共編成員列表（從共編代碼加入的成員）
-const collaborators = ref([
-  { id: 1, name: '馬阿姨', role: '主要聯絡人', isOwner: true },
-  { id: 2, name: '王先生', role: '家屬', isOwner: false },
-  { id: 3, name: '李小姐', role: '家屬', isOwner: false }
-])
+// 共編成員列表
+const collaborators = ref([])
 
-// 日曆事件資料（後端 API 格式）
-const calendarEvents = ref([
-  {
-    id: 1,
-    date: '2025-11-20',
-    time: '14:00',
-    title: '誦經法事',
-    category: '禮儀'
-  },
-  {
-    id: 2,
-    date: '2025-11-25',
-    time: '09:00',
-    title: '文件補件截止',
-    category: '行政'
-  },
-  {
-    id: 3,
-    date: '2025-11-27',
-    time: '10:30',
-    title: '家屬會議',
-    category: '行政'
-  },
-  {
-    id: 4,
-    date: '2025-11-20',
-    time: '16:00',
-    title: '場地佈置確認',
-    category: '禮儀'
-  },
-  {
-    id: 5,
-    date: '2025-11-30',
-    time: '11:00',
-    title: '最終審核',
-    category: '行政'
+// 日曆事件資料
+const calendarEvents = ref([])
+
+onMounted(async () => {
+  if (!roomId.value) {
+    displayToast('請先登入或加入房間')
+    router.push('/login')
+    return
   }
-])
+  
+  await fetchEvents()
+  await fetchCollaborators()
+})
+
+const fetchEvents = async () => {
+  try {
+    const events = await calendarApi.getEvents(roomId.value)
+    calendarEvents.value = events
+  } catch (error) {
+    console.error('Failed to fetch events:', error)
+  }
+}
+
+const fetchCollaborators = async () => {
+  try {
+    const members = await calendarApi.getCollaborators(roomId.value)
+    collaborators.value = members
+  } catch (error) {
+    console.error('Failed to fetch collaborators:', error)
+  }
+}
 
 const openShareDialog = async () => {
   showShareDialog.value = true
@@ -84,6 +79,18 @@ const openShareDialog = async () => {
 
 const closeShareDialog = () => {
   showShareDialog.value = false
+  shareCode.value = ''
+  inputCode.value = ''
+}
+
+const generateShareCode = async () => {
+  try {
+    const res = await calendarApi.getShareCode(roomId.value)
+    shareCode.value = res.code
+  } catch (error) {
+    console.error(error)
+    displayToast('無法取得共編代碼')
+  }
 }
 
 const copyShareCode = () => {
@@ -91,6 +98,29 @@ const copyShareCode = () => {
     navigator.clipboard.writeText(shareCode.value)
     displayToast('代碼已複製到剪貼簿！')
   }
+}
+
+const joinWithCode = async () => {
+  if (inputCode.value.trim()) {
+    try {
+      await roomsApi.joinRoom({ roomCode: inputCode.value })
+      displayToast('成功加入房間！')
+      // Refresh data or reload page
+      window.location.reload()
+    } catch (error) {
+      console.error(error)
+      displayToast(error.response?.data?.message || '加入失敗，請檢查代碼')
+    }
+    closeShareDialog()
+  } else {
+    displayToast('請輸入共編代碼')
+  }
+}
+
+const switchMode = (mode) => {
+  shareMode.value = mode
+  shareCode.value = ''
+  inputCode.value = ''
 }
 
 // 處理點擊日期
@@ -128,28 +158,30 @@ const toggleParticipant = (userId) => {
 }
 
 // 儲存新活動
-const saveNewEvent = () => {
+const saveNewEvent = async () => {
   if (!newEvent.value.title.trim()) {
     displayToast('請輸入活動標題')
     return
   }
   
-  const newId = Math.max(...calendarEvents.value.map(e => e.id), 0) + 1
-  const event = {
-    id: newId,
-    date: selectedDate.value,
-    time: newEvent.value.time,
-    title: newEvent.value.title,
-    category: newEvent.value.category,
-    participants: [...newEvent.value.participants]
+  try {
+    const eventData = {
+      title: newEvent.value.title,
+      date: selectedDate.value,
+      time: newEvent.value.time,
+      category: newEvent.value.category,
+      participants: newEvent.value.participants
+    }
+    
+    await calendarApi.createEvent(roomId.value, eventData)
+    await fetchEvents() // Refresh list
+    
+    closeEventDialog()
+    displayToast('活動已新增！')
+  } catch (error) {
+    console.error(error)
+    displayToast('新增活動失敗')
   }
-  
-  calendarEvents.value.push(event)
-  // TODO: 發送到後端 API
-  console.log('新增活動:', event)
-  
-  closeEventDialog()
-  displayToast('活動已新增！')
 }
 </script>
 
