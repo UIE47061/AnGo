@@ -2,6 +2,10 @@
 import { ref } from 'vue'
 import Calendar from '@/components/Calendar.vue'
 import BottomNav from '@/components/BottomNav.vue'
+import Toast from '@/components/Toast.vue'
+import { useToast } from '@/composables/useToast'
+
+const { displayToast } = useToast()
 
 // 共編相關狀態
 const showShareDialog = ref(false)
@@ -88,7 +92,7 @@ const generateShareCode = () => {
 const copyShareCode = () => {
   if (shareCode.value) {
     navigator.clipboard.writeText(shareCode.value)
-    alert('代碼已複製到剪貼簿！')
+    displayToast('代碼已複製到剪貼簿！')
   }
 }
 
@@ -96,10 +100,10 @@ const joinWithCode = () => {
   if (inputCode.value.trim()) {
     // TODO: 使用代碼加入共編，呼叫後端API
     console.log('使用代碼加入:', inputCode.value)
-    alert(`正在加入共編行事曆：${inputCode.value}`)
+    displayToast(`正在加入共編行事曆：${inputCode.value}`)
     closeShareDialog()
   } else {
-    alert('請輸入共編代碼')
+    displayToast('請輸入共編代碼')
   }
 }
 
@@ -146,7 +150,7 @@ const toggleParticipant = (userId) => {
 // 儲存新活動
 const saveNewEvent = () => {
   if (!newEvent.value.title.trim()) {
-    alert('請輸入活動標題')
+    displayToast('請輸入活動標題')
     return
   }
   
@@ -165,7 +169,7 @@ const saveNewEvent = () => {
   console.log('新增活動:', event)
   
   closeEventDialog()
-  alert('活動已新增！')
+  displayToast('活動已新增！')
 }
 </script>
 
@@ -381,6 +385,7 @@ const saveNewEvent = () => {
       </div>
     </transition>
 
+    <Toast />
     <BottomNav />
   </div>
 </template>

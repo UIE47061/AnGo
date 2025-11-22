@@ -2,8 +2,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import BottomNav from '@/components/BottomNav.vue'
+import Toast from '@/components/Toast.vue'
+import { useToast } from '@/composables/useToast'
 
 const router = useRouter()
+const { displayToast } = useToast()
 
 // 流程項目定義
 const processItems = [
@@ -163,7 +166,7 @@ const closeCompareView = () => {
 }
 
 const contactCompany = (company) => {
-  alert(`聯絡廠商：${company.name}`)
+  displayToast(`聯絡廠商：${company.name}`)
 }
 
 const selectedCompanies = () => {
@@ -261,7 +264,7 @@ const toggleCart = () => {
 // 確認服務
 const confirmServices = () => {
   if (totalSelectedServices.value === 0) {
-    alert('請先選擇服務項目')
+    displayToast('請先選擇服務項目')
     return
   }
   
@@ -279,8 +282,10 @@ const confirmServices = () => {
   
   localStorage.setItem('assignedServices', JSON.stringify(servicesData))
   
-  alert(`已確認 ${totalSelectedServices.value} 項服務，即將返回流程頁面`)
-  router.push({ name: 'Process' })
+  displayToast(`已確認 ${totalSelectedServices.value} 項服務，即將返回流程頁面`)
+  setTimeout(() => {
+    router.push({ name: 'Process' })
+  }, 1500)
 }
 </script>
 
@@ -522,6 +527,7 @@ const confirmServices = () => {
       </div>
     </div>
 
+    <Toast />
     <BottomNav />
   </div>
 </template>

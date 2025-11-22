@@ -3,9 +3,12 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ProgressCircle from '@/components/ProgressCircle.vue'
 import BottomNav from '@/components/BottomNav.vue'
+import Toast from '@/components/Toast.vue'
+import { useToast } from '@/composables/useToast'
 import { dashboardApi } from '@/api/dashboard'
 
 const router = useRouter()
+const { displayToast } = useToast()
 const showUserMenu = ref(false)
 const showUserOverlay = ref(false)
 const isLoggedIn = ref(false)
@@ -62,7 +65,7 @@ const closeOverlay = () => {
 
 const handleGoogleLogin = () => {
   // TODO: Google 登入邏輯
-  alert('正在連接 Google 登入...')
+  displayToast('正在連接 Google 登入...')
   // 登入成功後：
   // isLoggedIn.value = true
   // userName.value = 'Google 使用者名稱'
@@ -302,6 +305,7 @@ const handleLogout = () => {
       </div>
     </transition>
 
+    <Toast />
     <BottomNav />
   </div>
 </template>

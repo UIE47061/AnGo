@@ -2,9 +2,12 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import BottomNav from '@/components/BottomNav.vue'
+import Toast from '@/components/Toast.vue'
+import { useToast } from '@/composables/useToast'
 import { dashboardApi } from '@/api/dashboard'
 
 const router = useRouter()
+const { displayToast } = useToast()
 
 // 共編相關狀態
 const showShareDialog = ref(false)
@@ -207,17 +210,17 @@ const generateShareCode = () => {
 const copyShareCode = () => {
   if (shareCode.value) {
     navigator.clipboard.writeText(shareCode.value)
-    alert('代碼已複製到剪貼簿！')
+    displayToast('代碼已複製到剪貼簿！')
   }
 }
 
 const joinWithCode = () => {
   if (inputCode.value.trim()) {
     console.log('使用代碼加入:', inputCode.value)
-    alert(`正在加入共編流程：${inputCode.value}`)
+    displayToast(`正在加入共編流程：${inputCode.value}`)
     closeShareDialog()
   } else {
-    alert('請輸入共編代碼')
+    displayToast('請輸入共編代碼')
   }
 }
 
@@ -249,7 +252,7 @@ const assignToFamily = (member) => {
     assigningStep.value.assignedTo = member.name
     assigningStep.value.assignType = 'self'
     closeAssignDialog()
-    alert(`已分配給 ${member.name}`)
+    displayToast(`已分配給 ${member.name}`)
   }
 }
 
@@ -562,6 +565,7 @@ const toggleStep = (stepId) => {
       </div>
     </transition>
 
+    <Toast />
     <BottomNav />
   </div>
 </template>

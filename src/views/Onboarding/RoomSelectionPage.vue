@@ -2,8 +2,11 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { roomsApi } from '@/api/rooms'
+import Toast from '@/components/Toast.vue'
+import { useToast } from '@/composables/useToast'
 
 const router = useRouter()
+const { displayToast } = useToast()
 const showJoinDialog = ref(false)
 const showCreateDialog = ref(false)
 const roomCode = ref('')
@@ -27,7 +30,7 @@ const closeDialog = () => {
 
 const submitCreateRoom = async () => {
   if (!roomName.value.trim()) {
-    alert('請輸入房間名稱')
+    displayToast('請輸入房間名稱')
     return
   }
 
@@ -46,7 +49,7 @@ const submitCreateRoom = async () => {
     router.push({ name: 'OnboardingFaith' })
   } catch (error) {
     console.error(error)
-    alert(error.response?.data?.message || '建立房間失敗')
+    displayToast(error.response?.data?.message || '建立房間失敗')
   } finally {
     isLoading.value = false
   }
@@ -69,12 +72,12 @@ const submitRoomCode = async () => {
       router.push({ name: 'FamilyDashboard' })
     } catch (error) {
       console.error(error)
-      alert(error.response?.data?.message || '加入房間失敗')
+      displayToast(error.response?.data?.message || '加入房間失敗')
     } finally {
       isLoading.value = false
     }
   } else {
-    alert('請輸入房間代碼')
+    displayToast('請輸入房間代碼')
   }
 }
 </script>
@@ -188,6 +191,8 @@ const submitRoomCode = async () => {
         </div>
       </div>
     </transition>
+
+    <Toast />
   </div>
 </template>
 

@@ -1,6 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import BottomNav from '@/components/BottomNav.vue'
+import Toast from '@/components/Toast.vue'
+import { useToast } from '@/composables/useToast'
+
+const { displayToast } = useToast()
 
 const activeTab = ref('全部')
 const tabs = ['全部', '已審核', '待補件', '尚未上傳']
@@ -103,11 +107,11 @@ const documents = computed(() => {
 })
 
 const handleUpload = (doc) => {
-  alert(`上傳文件：${doc.name}`)
+  displayToast(`上傳文件：${doc.name}`)
 }
 
 const handleView = (doc) => {
-  alert(`查看文件：${doc.name}`)
+  displayToast(`查看文件：${doc.name}`)
 }
 </script>
 
@@ -225,6 +229,7 @@ const handleView = (doc) => {
       </div>
     </main>
 
+    <Toast />
     <BottomNav />
   </div>
 </template>
