@@ -1,14 +1,40 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ProgressCircle from '@/components/ProgressCircle.vue'
 import BottomNav from '@/components/BottomNav.vue'
+import { dashboardApi } from '@/api/dashboard'
 
 const router = useRouter()
 const showUserMenu = ref(false)
 const showUserOverlay = ref(false)
-const isLoggedIn = ref(true) // 登入狀態，可以根據實際情況修改
-const userName = ref('馬阿姨') // 使用者名稱
+const isLoggedIn = ref(false)
+const userName = ref('')
+const familyId = ref('')
+
+onMounted(async () => {
+  const token = localStorage.getItem('token')
+  const userStr = localStorage.getItem('user')
+  
+  if (token && userStr) {
+    const user = JSON.parse(userStr)
+    isLoggedIn.value = true
+    userName.value = user.name
+    familyId.value = user.familyId
+    
+    // Fetch dashboard data
+    try {
+      const data = await dashboardApi.getDashboardData(familyId.value)
+      // Update dashboard state here (omitted for brevity, but ready to use)
+      console.log('Dashboard data:', data)
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error)
+    }
+  } else {
+    // Redirect to login if not logged in
+    router.push('/login')
+  }
+})
 
 const navigateToQuote = () => {
   router.push({ name: 'Quote' })
@@ -45,10 +71,13 @@ const handleGoogleLogin = () => {
 
 const handleLogout = () => {
   if (confirm('確定要登出嗎？')) {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    localStorage.removeItem('familyId')
     isLoggedIn.value = false
     userName.value = ''
     closeOverlay()
-    alert('已登出')
+    router.push('/login')
   }
 }
 </script>
@@ -59,7 +88,7 @@ const handleLogout = () => {
       <!-- 上方問候 -->
       <header class="greeting">
         <div>
-          <h2>馬阿姨 您好！</h2>
+          <h2>{{ userName }} 您好！</h2>
           <p>這是您今日的流程進度</p>
         </div>
         
