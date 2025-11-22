@@ -256,27 +256,6 @@ const getCategoryBgColor = (category) => {
         </button>
       </div>
     </div>
-  </div>
-</template>
-
-<style scoped>
-/* ...existing code... */
-.delete-btn {
-  background: none;
-  border: none;
-  color: #9ca3af;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s;
-  margin-left: auto;
-}
-
-.delete-btn:hover {
-  color: #ef4444;
-  background: #fee2e2;
-}
-</style>
 
     <!-- 過去的事件 -->
     <div v-if="pastEvents.length > 0" class="event-list past-events">
@@ -578,5 +557,21 @@ const getCategoryBgColor = (category) => {
     width: 4px;
     height: 4px;
   }
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.delete-btn:hover {
+  color: #ef4444;
+  background: #fee2e2;
 }
 </style>
