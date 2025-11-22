@@ -1,8 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import BottomNav from '@/components/BottomNav.vue'
+import { chatApi } from '@/api/chat'
 
 const messageInput = ref('')
+const isLoading = ref(false)
 const chatMessages = ref([
   {
     id: 1,
@@ -11,7 +13,7 @@ const chatMessages = ref([
   }
 ])
 
-const sendMessage = () => {
+const sendMessage = async () => {
   const text = messageInput.value.trim()
   if (!text) return
 
@@ -23,20 +25,78 @@ const sendMessage = () => {
   })
 
   messageInput.value = ''
+  isLoading.value = true
 
-  // Simulate bot response
-  setTimeout(() => {
+  try {
+    const res = await chatApi.sendAiMessage(text)
     chatMessages.value.push({
       id: Date.now() + 1,
       type: 'bot',
-      text: '稍等，我正在為您查詢...'
+      text: res.reply
     })
-  }, 450)
+  } catch (error) {
+    console.error(error)
+    chatMessages.value.push({
+      id: Date.now() + 1,
+      type: 'bot',
+      text: '抱歉，我現在無法回答您的問題，請稍後再試。'
+    })
+  } finally {
+    isLoading.value = false
+    scrollToBottom()
+  }
 }
 
-const quickSend = (text) => {
-  messageInput.value = text
-  sendMessage()
+const quickSend = async (text) => {
+  // Add user message
+  chatMessages.value.push({
+    id: Date.now(),
+    type: 'user',
+    text
+  })
+  
+  isLoading.value = true
+  let queryCode = ''
+  if (text === '查看文件進度') queryCode = 'document_status'
+  if (text === '查看金流') queryCode = 'payment_status'
+
+  try {
+    if (queryCode) {
+      const res = await chatApi.quickQuery(queryCode)
+      chatMessages.value.push({
+        id: Date.now() + 1,
+        type: 'bot',
+        text: res.reply
+      })
+    } else {
+      // Fallback to normal chat if not a quick query
+      const res = await chatApi.sendAiMessage(text)
+      chatMessages.value.push({
+        id: Date.now() + 1,
+        type: 'bot',
+        text: res.reply
+      })
+    }
+  } catch (error) {
+    console.error(error)
+    chatMessages.value.push({
+      id: Date.now() + 1,
+      type: 'bot',
+      text: '抱歉，查詢失敗，請稍後再試。'
+    })
+  } finally {
+    isLoading.value = false
+    scrollToBottom()
+  }
+}
+
+const scrollToBottom = () => {
+  setTimeout(() => {
+    const container = document.getElementById('chat-scroll')
+    if (container) {
+      container.scrollTop = container.scrollHeight
+    }
+  }, 100)
 }
 </script>
 

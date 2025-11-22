@@ -24,10 +24,18 @@ export const chatApi = {
   },
 
   /**
+   * 發送 AI 訊息
+   * @param {string} message
+   */
+  sendAiMessage(message) {
+    return client.post('/ai/chat', { message })
+  },
+
+  /**
    * 快速查詢
    * @param {string} query - document_status | payment_status
    */
   quickQuery(query) {
-    return client.post('/chat/quick-query', { query })
+    return client.post('/ai/chat/quick-query', { query })
   }
 }
