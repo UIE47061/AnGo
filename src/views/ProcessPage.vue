@@ -11,6 +11,8 @@ import { roomsApi } from '@/api/rooms'
 const router = useRouter()
 const { displayToast } = useToast()
 
+const isLoading = ref(true)
+
 // 共編相關狀態
 const showShareDialog = ref(false)
 const shareCode = ref('')
@@ -54,6 +56,8 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('Failed to fetch data:', error)
+  } finally {
+    isLoading.value = false
   }
 })
 
@@ -367,139 +371,146 @@ const updateStepStatus = async (step, newStatus) => {
       </header>
 
       <!-- 進度總覽 -->
-      <section class="progress-overview">
-        <div class="progress-stats">
-          <div class="stat-item">
-            <div class="stat-number">{{ processSteps.filter(s => s.status === 'completed').length }}</div>
-            <div class="stat-label">已完成</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-number">{{ processSteps.filter(s => s.status === 'in-progress').length }}</div>
-            <div class="stat-label">進行中</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-number">{{ processSteps.filter(s => s.status === 'pending').length }}</div>
-            <div class="stat-label">待處理</div>
-          </div>
-        </div>
-        <div class="progress-bar-container">
-          <div 
-            class="progress-bar-fill" 
-            :style="{ width: `${(processSteps.filter(s => s.status === 'completed').length / processSteps.length) * 100}%` }"
-          ></div>
-        </div>
-      </section>
+      <div v-if="isLoading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>載入中...</p>
+      </div>
 
-      <!-- 流程步驟列表 -->
-      <section class="process-list">
-        <div
-          v-for="(step, index) in processSteps"
-          :key="step.id"
-          class="process-step"
-          :class="{ 
-            expanded: expandedStep === step.id,
-            completed: step.status === 'completed',
-            active: step.status === 'in-progress'
-          }"
-        >
-          <div class="step-header" @click="toggleStep(step.id)">
-            <div class="step-indicator">
-              <div class="step-number" :style="{ background: getStatusColor(step.status) }">
-                <svg v-if="step.status === 'completed'" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ffffff" stroke-width="3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span v-else>{{ index + 1 }}</span>
-              </div>
-              <div v-if="index < processSteps.length - 1" class="step-line"></div>
+      <template v-else>
+        <section class="progress-overview">
+          <div class="progress-stats">
+            <div class="stat-item">
+              <div class="stat-number">{{ processSteps.filter(s => s.status === 'completed').length }}</div>
+              <div class="stat-label">已完成</div>
             </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-number">{{ processSteps.filter(s => s.status === 'in-progress').length }}</div>
+              <div class="stat-label">進行中</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-number">{{ processSteps.filter(s => s.status === 'pending').length }}</div>
+              <div class="stat-label">待處理</div>
+            </div>
+          </div>
+          <div class="progress-bar-container">
+            <div 
+              class="progress-bar-fill" 
+              :style="{ width: `${(processSteps.filter(s => s.status === 'completed').length / processSteps.length) * 100}%` }"
+            ></div>
+          </div>
+        </section>
 
-            <div class="step-content">
-              <div class="step-title-row">
-                <h3 class="step-title">{{ step.title }}</h3>
-                <span class="step-status" :style="{ color: getStatusColor(step.status) }">
-                  {{ getStatusText(step.status) }}
-                </span>
+        <!-- 流程步驟列表 -->
+        <section class="process-list">
+          <div
+            v-for="(step, index) in processSteps"
+            :key="step.id"
+            class="process-step"
+            :class="{ 
+              expanded: expandedStep === step.id,
+              completed: step.status === 'completed',
+              active: step.status === 'in-progress'
+            }"
+          >
+            <div class="step-header" @click="toggleStep(step.id)">
+              <div class="step-indicator">
+                <div class="step-number" :style="{ background: getStatusColor(step.status) }">
+                  <svg v-if="step.status === 'completed'" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ffffff" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span v-else>{{ index + 1 }}</span>
+                </div>
+                <div v-if="index < processSteps.length - 1" class="step-line"></div>
               </div>
-              
-              <!-- 負責人資訊 -->
-              <div class="assign-info">
+
+              <div class="step-content">
+                <div class="step-title-row">
+                  <h3 class="step-title">{{ step.title }}</h3>
+                  <span class="step-status" :style="{ color: getStatusColor(step.status) }">
+                    {{ getStatusText(step.status) }}
+                  </span>
+                </div>
+                
+                <!-- 負責人資訊 -->
+                <div class="assign-info">
+                  <div 
+                    v-if="step.assignedTo" 
+                    class="assign-badge clickable" 
+                    :style="getAssignBadgeStyle(step.assignType)"
+                    @click.stop="openAssignDialog(step)"
+                  >
+                    <svg v-if="step.assignType === 'vendor'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="8.5" cy="7" r="4" />
+                    </svg>
+                    <span>{{ step.assignType === 'vendor' ? '業者' : '自辦' }}：{{ step.assignedTo }}</span>
+                    <svg class="edit-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </div>
+                  <button v-else class="unassigned-badge" @click.stop="openAssignDialog(step)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="16" />
+                      <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                    <span>尚未分配 - 點此分配</span>
+                  </button>
+                </div>
+                
+                <p class="step-description">{{ step.description }}</p>
                 <div 
-                  v-if="step.assignedTo" 
-                  class="assign-badge clickable" 
-                  :style="getAssignBadgeStyle(step.assignType)"
-                  @click.stop="openAssignDialog(step)"
+                  class="step-date clickable" 
+                  @click.stop="openDateDialog(step)"
+                  :class="{ 'placeholder': !step.date }"
                 >
-                  <svg v-if="step.assignType === 'vendor'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                  <svg v-else viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="8.5" cy="7" r="4" />
-                  </svg>
-                  <span>{{ step.assignType === 'vendor' ? '業者' : '自辦' }}：{{ step.assignedTo }}</span>
+                  📅 {{ step.date || '設定日期' }}
                   <svg class="edit-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </div>
-                <button v-else class="unassigned-badge" @click.stop="openAssignDialog(step)">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="16" />
-                    <line x1="8" y1="12" x2="16" y2="12" />
-                  </svg>
-                  <span>尚未分配 - 點此分配</span>
-                </button>
+                <div v-if="step.deadline && step.status === 'in-progress'" class="step-deadline">
+                  ⚠️ 截止日期：{{ step.deadline }}
+                </div>
               </div>
-              
-              <p class="step-description">{{ step.description }}</p>
-              <div 
-                class="step-date clickable" 
-                @click.stop="openDateDialog(step)"
-                :class="{ 'placeholder': !step.date }"
-              >
-                📅 {{ step.date || '設定日期' }}
-                <svg class="edit-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+
+              <div class="expand-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9" />
                 </svg>
               </div>
-              <div v-if="step.deadline && step.status === 'in-progress'" class="step-deadline">
-                ⚠️ 截止日期：{{ step.deadline }}
-              </div>
             </div>
 
-            <div class="expand-icon">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </div>
+            <transition name="expand">
+              <div v-if="expandedStep === step.id" class="step-details">
+                <div class="status-control">
+                  <label>變更狀態：</label>
+                  <select :value="step.status" @change="updateStepStatus(step, $event.target.value)" class="status-select">
+                    <option value="pending">待處理</option>
+                    <option value="in-progress">進行中</option>
+                    <option value="completed">已完成</option>
+                  </select>
+                </div>
+
+                <h4>詳細項目：</h4>
+                <ul class="details-list">
+                  <li v-for="(detail, idx) in step.details" :key="idx">
+                    {{ detail }}
+                  </li>
+                </ul>
+              </div>
+            </transition>
           </div>
-
-          <transition name="expand">
-            <div v-if="expandedStep === step.id" class="step-details">
-              <div class="status-control">
-                <label>變更狀態：</label>
-                <select :value="step.status" @change="updateStepStatus(step, $event.target.value)" class="status-select">
-                  <option value="pending">待處理</option>
-                  <option value="in-progress">進行中</option>
-                  <option value="completed">已完成</option>
-                </select>
-              </div>
-
-              <h4>詳細項目：</h4>
-              <ul class="details-list">
-                <li v-for="(detail, idx) in step.details" :key="idx">
-                  {{ detail }}
-                </li>
-              </ul>
-            </div>
-          </transition>
-        </div>
-      </section>
+        </section>
+      </template>
     </main>
 
     <!-- 日期編輯對話框 -->
@@ -721,6 +732,31 @@ const updateStepStatus = async (step, newStatus) => {
 
 .share-btn:active {
   transform: translateY(0);
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #9F35FF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* 進度總覽 */
