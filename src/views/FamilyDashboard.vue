@@ -87,6 +87,10 @@ const navigateToDocuments = () => {
   router.push({ name: 'Documents' })
 }
 
+const navigateToProcess = () => {
+  router.push({ name: 'Process' })
+}
+
 const toggleUserOverlay = () => {
   showUserOverlay.value = !showUserOverlay.value
 }
@@ -158,7 +162,7 @@ const handleLogout = () => {
             <div class="progress-panel">
               <div class="tag">目前進度</div>
               <h3>{{ currentStage }}</h3>
-              <button class="link-btn">查看詳細任務 →</button>
+              <button class="link-btn" @click="navigateToProcess">查看詳細任務 →</button>
               <p class="hint hint-panel">再完成 {{ remainingTasks }} 項任務即可結案</p>
             </div>
           </div>
