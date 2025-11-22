@@ -200,6 +200,10 @@ const updateStatus = async (doc, newStatus) => {
     displayToast('更新狀態失敗')
   }
 }
+
+onMounted(() => {
+  fetchDocuments()
+})
 </script>
 
 <template>
