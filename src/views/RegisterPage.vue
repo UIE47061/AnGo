@@ -37,8 +37,8 @@ const handleRegister = async () => {
     localStorage.setItem('user', JSON.stringify(res.user))
     localStorage.setItem('familyId', res.user.familyId)
 
-    // Redirect to dashboard
-    router.push('/family')
+    // Redirect to onboarding
+    router.push('/onboarding/room')
   } catch (error) {
     console.error(error)
     errorMessage.value = error.response?.data?.message || '註冊失敗，請稍後再試'

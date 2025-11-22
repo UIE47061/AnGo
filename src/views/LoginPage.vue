@@ -27,21 +27,26 @@ const handleLogin = async () => {
     // Save token and user info
     localStorage.setItem('token', res.token)
     localStorage.setItem('user', JSON.stringify(res.user))
+    
     if (res.user.roomId) {
       localStorage.setItem('roomId', res.user.roomId)
     }
 
+    if (res.user.familyId) {
+      localStorage.setItem('familyId', res.user.familyId)
+    }
+
     // Check if user has a room
-    if (!res.user.roomId) {
-      // No room - go to room selection
-      router.push('/onboarding/room')
-    } else {
+    if (res.user.roomId) {
       // Has room - go to dashboard
       if (res.user.role === 'family_member') {
         router.push('/family')
       } else {
         router.push('/provider')
       }
+    } else {
+      // No room - go to room selection
+      router.push('/onboarding/room')
     }
   } catch (error) {
     console.error(error)
