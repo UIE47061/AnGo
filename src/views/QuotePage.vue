@@ -626,21 +626,41 @@ const confirmServices = () => {
 
 .filter-select {
   padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
+  padding-right: 28px;
+  border-radius: 10px;
+  border: 2px solid rgba(159, 53, 255, 0.15);
+  background: linear-gradient(135deg, #fafbff, #ffffff);
   color: #2b2b3a;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 36px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239F35FF' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+  box-shadow: 0 2px 4px rgba(159, 53, 255, 0.08);
+}
+
+.filter-select:hover {
+  border-color: rgba(159, 53, 255, 0.3);
+  background: linear-gradient(135deg, #f8f5ff, #ffffff);
+  box-shadow: 0 2px 8px rgba(159, 53, 255, 0.12);
 }
 
 .filter-select:focus {
   outline: none;
   border-color: #9F35FF;
-  box-shadow: 0 0 0 3px rgba(159, 53, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(159, 53, 255, 0.15), 0 2px 8px rgba(159, 53, 255, 0.2);
+  background: #ffffff;
+}
+
+.filter-select:active {
+  transform: scale(0.98);
 }
 
 /* 結果數量 */
