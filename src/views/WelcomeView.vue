@@ -54,9 +54,9 @@ const handleProviderEntry = () => {
   width: 100vw;
   background: linear-gradient(
     to bottom,
-    #e8c4f0 0%,
-    #c77ddb 50%,
-    #9b59b6 100%
+    #d4a3ff 0%,
+    #9F35FF 50%,
+    #7a1fd9 100%
   );
   display: flex;
   flex-direction: column;

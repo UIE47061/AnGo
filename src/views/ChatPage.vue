@@ -223,7 +223,7 @@ header h3 {
 }
 
 .chat-input input:focus {
-  border-color: #ab4db5;
+  border-color: #9F35FF;
 }
 
 #send-btn {
@@ -231,7 +231,7 @@ header h3 {
   min-height: 44px;
   border-radius: 999px;
   border: none;
-  background: #c77ddb;
+  background: #9F35FF;
   color: #fff;
   cursor: pointer;
   font-weight: 600;
@@ -240,6 +240,6 @@ header h3 {
 }
 
 #send-btn:hover {
-  background: #9b59b6;
+  background: #7a1fd9;
 }
 </style>

@@ -203,9 +203,9 @@ const handleView = (doc) => {
 }
 
 .doc-tab.active {
-  background: #c77ddb;
+  background: #9F35FF;
   color: #fff;
-  box-shadow: 0 8px 18px rgba(199, 125, 219, 0.28);
+  box-shadow: 0 8px 18px rgba(159, 53, 255, 0.28);
 }
 
 .doc-list {
@@ -327,7 +327,7 @@ const handleView = (doc) => {
 .view-doc:hover,
 .upload-btn:hover {
   background: #f8f8fb;
-  border-color: #c77ddb;
+  border-color: #9F35FF;
 }
 
 .reupload-doc {
@@ -336,7 +336,7 @@ const handleView = (doc) => {
   min-height: 44px;
   border-radius: 10px;
   border: none;
-  background: #c77ddb;
+  background: #9F35FF;
   color: #fff;
   cursor: pointer;
   font-weight: 600;
@@ -355,7 +355,7 @@ const handleView = (doc) => {
 }
 
 .reupload-doc:hover {
-  background: #9b59b6;
+  background: #7a1fd9;
 }
 
 .empty-state {

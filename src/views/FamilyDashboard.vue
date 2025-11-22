@@ -223,9 +223,9 @@ const navigateToPayment = () => {
   position: relative;
   border-radius: 1rem;
   padding: 1.1rem 1rem 0.9rem;
-  background: linear-gradient(90deg, #e8c4f0 10%, #c77ddb 60%);
+  background: linear-gradient(90deg, #d4a3ff 10%, #9F35FF 60%);
   color: #fff;
-  box-shadow: 0 18px 36px rgba(199, 125, 219, 0.32);
+  box-shadow: 0 18px 36px rgba(159, 53, 255, 0.32);
   overflow: visible;
 }
 
@@ -289,11 +289,11 @@ const navigateToPayment = () => {
   position: absolute;
   top: -2.6rem;
   right: 2.1rem;
-  background: linear-gradient(180deg, #d4a3dd, #9b59b6);
+  background: linear-gradient(180deg, #b87dff, #9F35FF);
   padding: 0.5rem 1.6rem;
   border-radius: 999px;
   font-size: 0.88rem;
-  box-shadow: 0 10px 20px rgba(199, 125, 219, 0.38);
+  box-shadow: 0 10px 20px rgba(159, 53, 255, 0.38);
   white-space: nowrap;
   line-height: 1;
   transform: translateZ(0);
@@ -307,7 +307,7 @@ const navigateToPayment = () => {
   bottom: -7px;
   width: 16px;
   height: 9px;
-  background: linear-gradient(180deg, #9b59b6, #7d3c8f);
+  background: linear-gradient(180deg, #9F35FF, #7a1fd9);
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.18));
 }
@@ -381,14 +381,14 @@ const navigateToPayment = () => {
 .upload-card {
   background: #ffffff;
   border-radius: 1.4rem;
-  padding: 1.6rem 1.4rem;
+  padding: 1rem 1rem;
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
 }
 
 .upload-inner {
   border: 1px dashed #c8c8d3;
   border-radius: 1rem;
-  padding: 1.6rem 1.2rem;
+  padding: 0.7rem 1rem;
   text-align: center;
 }
 
@@ -425,10 +425,10 @@ const navigateToPayment = () => {
 .reminder-bar {
   border-radius: 999px;
   padding: 0.7rem 1.1rem;
-  background: linear-gradient(90deg, #b084bb, #e8c4f0);
+  background: linear-gradient(90deg, #9F35FF, #d4a3ff);
   color: #fff;
   font-size: 0.85rem;
-  box-shadow: 0 8px 14px rgba(199, 125, 219, 0.32);
+  box-shadow: 0 8px 14px rgba(159, 53, 255, 0.32);
 }
 
 .calendar-card {

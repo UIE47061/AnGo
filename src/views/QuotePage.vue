@@ -332,9 +332,9 @@ header h3 {
 }
 
 .btn-compare.active {
-  background: #c77ddb;
+  background: #9F35FF;
   color: #fff;
-  border-color: #c77ddb;
+  border-color: #9F35FF;
 }
 
 .btn-detail {
@@ -343,7 +343,7 @@ header h3 {
   min-height: 44px;
   border-radius: 10px;
   border: none;
-  background: #c77ddb;
+  background: #9F35FF;
   color: #fff;
   cursor: pointer;
   font-weight: 600;
@@ -352,7 +352,7 @@ header h3 {
 }
 
 .btn-detail:hover {
-  background: #9b59b6;
+  background: #7a1fd9;
 }
 
 .compare-bar {
@@ -478,7 +478,7 @@ header h3 {
   min-height: 44px;
   border-radius: 10px;
   border: none;
-  background: #c77ddb;
+  background: #9F35FF;
   color: #fff;
   cursor: pointer;
   font-weight: 600;
@@ -487,7 +487,7 @@ header h3 {
 }
 
 .overlay-contact:hover {
-  background: #9b59b6;
+  background: #7a1fd9;
 }
 
 .compare-list {

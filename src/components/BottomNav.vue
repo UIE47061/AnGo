@@ -32,7 +32,7 @@ const openChat = () => {
           width="20"
           height="20"
           fill="none"
-          stroke="#c77ddb"
+          stroke="#9F35FF"
           stroke-width="1.8"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -168,9 +168,9 @@ const openChat = () => {
 }
 
 .nav-item.active {
-  background: linear-gradient(180deg, #c77ddb, #9b59b6);
+  background: linear-gradient(180deg, #9F35FF, #7a1fd9);
   color: #fff;
-  box-shadow: 0 8px 18px rgba(199, 125, 219, 0.35);
+  box-shadow: 0 8px 18px rgba(159, 53, 255, 0.35);
   transform: translateY(-2px);
 }
 

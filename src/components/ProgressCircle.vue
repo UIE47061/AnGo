@@ -76,8 +76,8 @@ onUnmounted(() => {
         <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
           <defs>
             <linearGradient id="liquidGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" style="stop-color:#e8c4f0;stop-opacity:0.92" />
-              <stop offset="100%" style="stop-color:#c77ddb;stop-opacity:1" />
+              <stop offset="0%" style="stop-color:#d4a3ff;stop-opacity:0.92" />
+              <stop offset="100%" style="stop-color:#9F35FF;stop-opacity:1" />
             </linearGradient>
           </defs>
           <g id="liquid-group">
@@ -113,7 +113,7 @@ onUnmounted(() => {
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  background: linear-gradient(145deg, rgba(199, 125, 219, 0.3), rgba(199, 125, 219, 0.05));
+  background: linear-gradient(145deg, rgba(159, 53, 255, 0.3), rgba(159, 53, 255, 0.05));
   z-index: -1;
 }
 
