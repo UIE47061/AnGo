@@ -1,14 +1,17 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { roomsApi } from '@/api/rooms'
 
 const router = useRouter()
 const showJoinDialog = ref(false)
+const showCreateDialog = ref(false)
 const roomCode = ref('')
+const roomName = ref('')
+const isLoading = ref(false)
 
 const createNewRoom = () => {
-  // 創建新房間，進入信仰選擇頁面
-  router.push({ name: 'OnboardingFaith' })
+  showCreateDialog.value = true
 }
 
 const joinExistingRoom = () => {
@@ -17,18 +20,59 @@ const joinExistingRoom = () => {
 
 const closeDialog = () => {
   showJoinDialog.value = false
+  showCreateDialog.value = false
   roomCode.value = ''
+  roomName.value = ''
 }
 
-const submitRoomCode = () => {
-  if (roomCode.value.trim()) {
-    // TODO: 驗證房間代碼
-    // 儲存房間資訊到 localStorage
-    localStorage.setItem('roomCode', roomCode.value)
-    localStorage.setItem('isRoomOwner', 'false')
+const submitCreateRoom = async () => {
+  if (!roomName.value.trim()) {
+    alert('請輸入房間名稱')
+    return
+  }
+
+  isLoading.value = true
+  try {
+    const res = await roomsApi.createRoom({ displayName: roomName.value })
     
-    // 直接進入主頁
-    router.push({ name: 'FamilyDashboard' })
+    // Update user info in localStorage
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    user.roomId = res.id
+    localStorage.setItem('user', JSON.stringify(user))
+    localStorage.setItem('roomId', res.id)
+    localStorage.setItem('isRoomOwner', 'true')
+
+    // Go to next step
+    router.push({ name: 'OnboardingFaith' })
+  } catch (error) {
+    console.error(error)
+    alert(error.response?.data?.message || '建立房間失敗')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const submitRoomCode = async () => {
+  if (roomCode.value.trim()) {
+    isLoading.value = true
+    try {
+      const res = await roomsApi.joinRoom({ roomCode: roomCode.value })
+      
+      // Update user info in localStorage
+      const user = JSON.parse(localStorage.getItem('user') || '{}')
+      user.roomId = res.id
+      localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('roomId', res.id)
+      localStorage.setItem('isRoomOwner', 'false')
+      
+      // Go to dashboard
+      router.push({ name: 'FamilyDashboard' })
+    } catch (error) {
+      console.error(error)
+      alert(error.response?.data?.message || '加入房間失敗')
+    } finally {
+      isLoading.value = false
+    }
   } else {
     alert('請輸入房間代碼')
   }
@@ -84,6 +128,36 @@ const submitRoomCode = () => {
         </button>
       </div>
     </div>
+
+    <!-- 創建房間對話框 -->
+    <transition name="dialog-fade">
+      <div v-if="showCreateDialog" class="dialog-overlay" @click.self="closeDialog">
+        <div class="dialog-content">
+          <button class="close-btn" @click="closeDialog">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+
+          <h3>創建新房間</h3>
+          <p>請為您的房間命名（例如：王大明家屬）</p>
+
+          <input
+            v-model="roomName"
+            type="text"
+            placeholder="輸入房間名稱"
+            class="code-input"
+            style="letter-spacing: normal; text-align: left;"
+            @keyup.enter="submitCreateRoom"
+          />
+
+          <button class="submit-btn" @click="submitCreateRoom" :disabled="isLoading">
+            {{ isLoading ? '建立中...' : '確認建立' }}
+          </button>
+        </div>
+      </div>
+    </transition>
 
     <!-- 加入房間對話框 -->
     <transition name="dialog-fade">

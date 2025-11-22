@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import BottomNav from '@/components/BottomNav.vue'
+import { dashboardApi } from '@/api/dashboard'
 
 const router = useRouter()
 
@@ -10,6 +11,18 @@ const showShareDialog = ref(false)
 const shareMode = ref('generate') // 'generate' 或 'input'
 const shareCode = ref('')
 const inputCode = ref('')
+
+onMounted(async () => {
+  try {
+    const roomId = localStorage.getItem('roomId')
+    if (roomId) {
+      const res = await dashboardApi.getDashboardData(roomId)
+      shareCode.value = res.room.roomCode
+    }
+  } catch (error) {
+    console.error('Failed to fetch room info:', error)
+  }
+})
 
 // 分配相關狀態
 const showAssignDialog = ref(false)
