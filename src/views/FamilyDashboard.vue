@@ -3,48 +3,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ProgressCircle from '@/components/ProgressCircle.vue'
 import BottomNav from '@/components/BottomNav.vue'
-import Calendar from '@/components/Calendar.vue'
 
 const router = useRouter()
-
-// 日曆事件資料（後端 API 格式）
-const calendarEvents = ref([
-  {
-    id: 1,
-    date: '2025-11-20',
-    time: '14:00',
-    title: '誦經法事',
-    category: '禮儀'
-  },
-  {
-    id: 2,
-    date: '2025-11-25',
-    time: '09:00',
-    title: '文件補件截止',
-    category: '行政'
-  },
-  {
-    id: 3,
-    date: '2025-11-27',
-    time: '10:30',
-    title: '家屬會議',
-    category: '行政'
-  },
-  {
-    id: 4,
-    date: '2025-11-20',
-    time: '16:00',
-    title: '場地佈置確認',
-    category: '禮儀'
-  },
-  {
-    id: 5,
-    date: '2025-11-30',
-    time: '11:00',
-    title: '最終審核',
-    category: '行政'
-  }
-])
 
 const navigateToQuote = () => {
   router.push({ name: 'Quote' })
@@ -52,6 +12,14 @@ const navigateToQuote = () => {
 
 const navigateToPayment = () => {
   router.push({ name: 'Payment' })
+}
+
+const navigateToCalendar = () => {
+  router.push({ name: 'Calendar' })
+}
+
+const navigateToDocuments = () => {
+  router.push({ name: 'Documents' })
 }
 </script>
 
@@ -68,8 +36,8 @@ const navigateToPayment = () => {
 
       <!-- 進度卡片 -->
       <section class="progress-card">
-        <!-- 氣泡提示按鈕 -->
-        <div class="bubble-label">確認誦經與法事日期</div>
+        <!-- 氣泡提示按鈕
+        <div class="bubble-label">確認誦經與法事日期</div> -->
 
         <div class="progress-main">
           <!-- 左側內框 -->
@@ -132,7 +100,7 @@ const navigateToPayment = () => {
       </section>
 
       <!-- 文件上傳 -->
-      <section class="upload-card">
+      <section class="upload-card" @click="navigateToDocuments">
         <div class="upload-inner">
           <div class="upload-icon" aria-hidden="true">
             <svg
@@ -156,13 +124,36 @@ const navigateToPayment = () => {
         </div>
       </section>
 
-      <!-- 提醒 + 行事曆 -->
-      <section class="calendar-section">
-        <div class="reminder-bar">
-          <span>11/25 為補件截止日，是否幫您設提醒？</span>
-        </div>
+      <!-- 快速連結卡片 -->
+      <section class="quick-links">
+        <button class="quick-link-card" @click="navigateToCalendar">
+          <div class="quick-icon">
+            <svg
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="#9F35FF"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </div>
+          <div class="quick-text">
+            <h4>查看行事曆</h4>
+            <p>管理您的所有預定事項</p>
+          </div>
+          <div class="quick-arrow">›</div>
+        </button>
 
-        <Calendar :events="calendarEvents" />
+        <div class="reminder-bar">
+          <span>💡 11/25 為補件截止日，記得完成文件上傳</span>
+        </div>
       </section>
     </main>
 
@@ -378,6 +369,17 @@ const navigateToPayment = () => {
   border-radius: 1.4rem;
   padding: 1rem 1rem;
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1);
+}
+
+.upload-card:active {
+  transform: translateY(0);
 }
 
 .upload-inner {
@@ -411,10 +413,72 @@ const navigateToPayment = () => {
   font-size: 0.9rem;
 }
 
-.calendar-section {
+.quick-links {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
+}
+
+.quick-link-card {
+  background: #ffffff;
+  border-radius: 1.2rem;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.quick-link-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.quick-link-card:active {
+  transform: translateY(0);
+}
+
+.quick-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(159, 53, 255, 0.1), rgba(159, 53, 255, 0.05));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quick-icon svg {
+  display: block;
+}
+
+.quick-text {
+  flex: 1;
+}
+
+.quick-text h4 {
+  margin: 0;
+  color: #2b2b3a;
+  font-size: 1rem;
+}
+
+.quick-text p {
+  margin: 0.25rem 0 0;
+  color: #6b6b80;
+  font-size: 0.85rem;
+}
+
+.quick-arrow {
+  font-size: 1.8rem;
+  color: #9F35FF;
+  font-weight: 300;
+  flex-shrink: 0;
 }
 
 .reminder-bar {
@@ -424,5 +488,7 @@ const navigateToPayment = () => {
   color: #fff;
   font-size: 0.85rem;
   box-shadow: 0 8px 14px rgba(159, 53, 255, 0.32);
+  text-align: center;
 }
 </style>
+
