@@ -40,8 +40,13 @@ export const chatApi = {
    */
   async streamAiMessage(message, onChunk, onDone, onError) {
     try {
-      const baseURL = client.defaults.baseURL
+      let baseURL = client.defaults.baseURL
+      if (baseURL.endsWith('/')) {
+        baseURL = baseURL.slice(0, -1)
+      }
+      
       const token = localStorage.getItem('token')
+      console.log('[Stream] Connecting to:', `${baseURL}/ai/chat/stream`)
       
       const response = await fetch(`${baseURL}/ai/chat/stream`, {
         method: 'POST',
@@ -67,11 +72,13 @@ export const chatApi = {
         const { value, done } = await reader.read()
         if (done) break
         
-        buffer += decoder.decode(value, { stream: true })
+        const chunkText = decoder.decode(value, { stream: true })
+        // console.log('[Stream] Received chunk raw:', chunkText)
+        buffer += chunkText
         const lines = buffer.split('\n')
         
         // Process all complete lines
-        buffer = lines.pop() || '' // Keep the last partial line in buffer
+        buffer = lines.pop() || '' 
         
         for (const line of lines) {
           if (line.trim() === '') continue
