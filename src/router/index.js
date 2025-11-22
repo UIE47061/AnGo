@@ -28,6 +28,11 @@ const routes = [
     component: () => import('@/views/DocumentPage.vue'),
   },
   {
+    path: '/calendar',
+    name: 'Calendar',
+    component: () => import('@/views/CalendarPage.vue'),
+  },
+  {
     path: '/quote',
     name: 'Quote',
     component: () => import('@/views/QuotePage.vue'),

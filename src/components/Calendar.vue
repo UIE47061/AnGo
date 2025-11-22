@@ -8,6 +8,8 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['date-click'])
+
 const activeFilter = ref('全部')
 const filters = ['全部', '行政', '禮儀']
 
@@ -16,6 +18,18 @@ const today = new Date()
 const currentDay = today.getDate()
 const currentMonth = today.getMonth() + 1
 const currentYear = today.getFullYear()
+
+// 處理點擊日期
+const handleDayClick = (day) => {
+  if (!day) return
+  
+  // 格式化日期為 YYYY-MM-DD
+  const month = String(currentMonth).padStart(2, '0')
+  const dayStr = String(day).padStart(2, '0')
+  const dateStr = `${currentYear}-${month}-${dayStr}`
+  
+  emit('date-click', dateStr)
+}
 
 // 根據篩選條件過濾事件
 const filteredEvents = computed(() => {
@@ -145,8 +159,10 @@ const getCategoryBgColor = (category) => {
         :class="{ 
           empty: !item.day,
           'has-events': item.events.length > 0,
-          'is-today': item.day === currentDay
+          'is-today': item.day === currentDay,
+          'clickable': item.day
         }"
+        @click="handleDayClick(item.day)"
       >
         <span v-if="item.day" class="day-number">{{ item.day }}</span>
         <div v-if="item.events.length > 0" class="event-dots">
