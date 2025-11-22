@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = defineProps({
   events: {
@@ -8,25 +8,42 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['date-click'])
+const emit = defineEmits(['date-click', 'month-change'])
 
 const activeFilter = ref('全部')
 const filters = ['全部', '行政', '禮儀', '流程']
 
-// 取得今天的日期
+// 日期狀態
 const today = new Date()
+const displayDate = ref(new Date()) // 當前顯示的月份
+
 const currentDay = today.getDate()
-const currentMonth = today.getMonth() + 1
-const currentYear = today.getFullYear()
+const currentMonth = computed(() => displayDate.value.getMonth() + 1)
+const currentYear = computed(() => displayDate.value.getFullYear())
+
+// 切換月份
+const prevMonth = () => {
+  const newDate = new Date(displayDate.value)
+  newDate.setMonth(newDate.getMonth() - 1)
+  displayDate.value = newDate
+  emit('month-change', { year: currentYear.value, month: currentMonth.value })
+}
+
+const nextMonth = () => {
+  const newDate = new Date(displayDate.value)
+  newDate.setMonth(newDate.getMonth() + 1)
+  displayDate.value = newDate
+  emit('month-change', { year: currentYear.value, month: currentMonth.value })
+}
 
 // 處理點擊日期
 const handleDayClick = (day) => {
   if (!day) return
   
   // 格式化日期為 YYYY-MM-DD
-  const month = String(currentMonth).padStart(2, '0')
+  const month = String(currentMonth.value).padStart(2, '0')
   const dayStr = String(day).padStart(2, '0')
-  const dateStr = `${currentYear}-${month}-${dayStr}`
+  const dateStr = `${currentYear.value}-${month}-${dayStr}`
   
   emit('date-click', dateStr)
 }
@@ -50,30 +67,27 @@ const sortedEvents = computed(() => {
 
 // 即將到來的事件（今天及之後）
 const upcomingEvents = computed(() => {
-  const todayStart = new Date(currentYear, currentMonth - 1, currentDay, 0, 0, 0)
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0)
   return sortedEvents.value.filter(event => {
-    const eventDate = new Date(event.date + ' ' + event.time)
+    const eventDate = new Date(event.date + ' ' + (event.time || '00:00'))
     return eventDate >= todayStart
   })
-})
-
-// 過去的事件
-const pastEvents = computed(() => {
-  const todayStart = new Date(currentYear, currentMonth - 1, currentDay, 0, 0, 0)
-  return sortedEvents.value.filter(event => {
-    const eventDate = new Date(event.date + ' ' + event.time)
-    return eventDate < todayStart
-  }).reverse() // 最近的過去事件在前
 })
 
 // 生成日曆格子
 const generateCalendarDays = () => {
   const days = []
-  const daysInMonth = 30
-  const startDay = 5 // 11月1日是星期五
+  const year = currentYear.value
+  const month = currentMonth.value - 1 // 0-indexed
+
+  // 取得當月第一天是星期幾 (0-6)
+  const firstDay = new Date(year, month, 1).getDay()
+  
+  // 取得當月總天數
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
 
   // 填充空白天數
-  for (let i = 0; i < startDay; i++) {
+  for (let i = 0; i < firstDay; i++) {
     days.push({ day: null, events: [] })
   }
 
@@ -81,7 +95,7 @@ const generateCalendarDays = () => {
   for (let day = 1; day <= daysInMonth; day++) {
     const dayEvents = filteredEvents.value.filter(event => {
       const [eYear, eMonth, eDay] = event.date.split('-').map(Number)
-      return eYear === currentYear && eMonth === currentMonth && eDay === day
+      return eYear === year && eMonth === (month + 1) && eDay === day
     })
     days.push({ day, events: dayEvents })
   }
@@ -123,10 +137,10 @@ const getCategoryBgColor = (category) => {
 <template>
   <div class="calendar-card">
     <div class="calendar-header">
-      <div class="calendar-title">11月 行事曆</div>
+      <div class="calendar-title">{{ currentYear }}年 {{ currentMonth }}月</div>
       <div class="calendar-nav">
-        <button>&lt;</button>
-        <button>&gt;</button>
+        <button @click="prevMonth">&lt;</button>
+        <button @click="nextMonth">&gt;</button>
       </div>
     </div>
 
@@ -203,10 +217,43 @@ const getCategoryBgColor = (category) => {
         </div>
         <div class="event-info">
           <div class="event-title">{{ event.title }}</div>
-          <div class="event-date">{{ event.date }} {{ event.time }}</div>
+          <div class="event-time">
+            {{ event.date }} {{ event.time }}
+          </div>
         </div>
+        <!-- Delete Button (Only for manual events, not process items) -->
+        <button 
+          v-if="event.category !== '流程'"
+          class="delete-btn"
+          @click.stop="$emit('delete-event', event.id)"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+          </svg>
+        </button>
       </div>
     </div>
+  </div>
+</template>
+
+<style scoped>
+/* ...existing code... */
+.delete-btn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.delete-btn:hover {
+  color: #ef4444;
+  background: #fee2e2;
+}
+</style>
 
     <!-- 過去的事件 -->
     <div v-if="pastEvents.length > 0" class="event-list past-events">

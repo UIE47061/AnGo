@@ -45,12 +45,35 @@ onMounted(async () => {
   await fetchCollaborators()
 })
 
-const fetchEvents = async () => {
+const fetchEvents = async (year, month) => {
   try {
-    const events = await calendarApi.getEvents(roomId.value)
+    const events = await calendarApi.getEvents(roomId.value, year, month)
     calendarEvents.value = events
   } catch (error) {
     console.error('Failed to fetch events:', error)
+  }
+}
+
+const handleMonthChange = async ({ year, month }) => {
+  await fetchEvents(year, month)
+}
+
+const handleDeleteEvent = async (eventId) => {
+  if (!confirm('確定要刪除此活動嗎？')) return
+  
+  try {
+    await calendarApi.deleteEvent(roomId.value, eventId)
+    displayToast('活動已刪除')
+    // Refresh current view (we might need to track current year/month state in parent too, 
+    // but for now fetching without params gets all, or we can just rely on the fact that 
+    // the user is likely viewing the month of the deleted event)
+    // Ideally we should pass the current view's year/month.
+    // For simplicity, let's just fetch all or let the user navigate.
+    // Actually, let's just fetch all again to be safe as we don't track current view state here yet.
+    await fetchEvents() 
+  } catch (error) {
+    console.error(error)
+    displayToast('刪除失敗')
   }
 }
 
@@ -216,7 +239,12 @@ const saveNewEvent = async () => {
         </button>
       </header>
 
-      <Calendar :events="calendarEvents" @date-click="handleDateClick" />
+      <Calendar 
+        :events="calendarEvents" 
+        @date-click="handleDateClick"
+        @month-change="handleMonthChange"
+        @delete-event="handleDeleteEvent"
+      />
     </main>
 
     <!-- 新增活動對話框 -->

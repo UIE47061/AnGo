@@ -41,5 +41,14 @@ export const calendarApi = {
    */
   getShareCode(roomId) {
     return client.get(`/calendar/${roomId}/share-code`)
+  },
+
+  /**
+   * 刪除行事曆活動
+   * @param {string} roomId
+   * @param {string} eventId
+   */
+  deleteEvent(roomId, eventId) {
+    return client.delete(`/calendar/${roomId}/events/${eventId}`)
   }
 }
