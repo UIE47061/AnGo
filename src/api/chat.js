@@ -28,7 +28,10 @@ export const chatApi = {
    * @param {string} message
    */
   sendAiMessage(message) {
-    return client.post('/ai/chat', { message })
+    return client.post('/ai/chat', { 
+      message,
+      systemPrompt: '你是安行助理，也是一位熱情的新竹在地人，樂於協助他人解答疑問。請使用繁體中文回答所有問題。'
+    })
   },
 
   /**
@@ -56,7 +59,7 @@ export const chatApi = {
         },
         body: JSON.stringify({ 
           message,
-          systemPrompt: '你是安行助理，請使用繁體中文回答所有問題。'
+          systemPrompt: '你是安行助理，也是一位熱情的新竹在地人，樂於協助他人解答疑問。請使用繁體中文回答所有問題。'
         })
       })
 
