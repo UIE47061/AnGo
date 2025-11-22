@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import BottomNav from '@/components/BottomNav.vue'
 import { dashboardApi } from '@/api/dashboard'
 import { servicesApi } from '@/api/services'
+import { roomsApi } from '@/api/rooms'
 
 const router = useRouter()
 
@@ -21,7 +22,16 @@ onMounted(async () => {
       const res = await dashboardApi.getDashboardData(roomId)
       shareCode.value = res.room.roomCode
 
-      // 2. Get Assigned Services
+      // 2. Get Room Members
+      const members = await roomsApi.getMembers(roomId)
+      familyMembers.value = members.map(m => ({
+        id: m.id,
+        name: m.name,
+        role: m.role === 'family_member' ? '家屬' : m.role,
+        isOwner: false // TODO: Determine owner
+      }))
+
+      // 3. Get Assigned Services
       const services = await servicesApi.getServices(roomId)
       
       // Update process steps with assigned services
@@ -29,8 +39,12 @@ onMounted(async () => {
         const step = processSteps.value.find(s => s.id === service.processId)
         if (step) {
           step.assignedTo = service.providerName
-          step.assignType = 'vendor'
-          // You might want to update status based on service.status if needed
+          // Map backend 'family' to frontend 'self' for styling, or update styling
+          step.assignType = service.assignType === 'family' ? 'self' : 'vendor'
+          step.assignedUserId = service.assignedUserId
+          if (service.status) {
+            step.status = service.status
+          }
         }
       })
     }
@@ -259,12 +273,26 @@ const assignToVendor = () => {
   router.push({ name: 'Quote' })
 }
 
-const assignToFamily = (member) => {
+const assignToFamily = async (member) => {
   if (assigningStep.value) {
-    assigningStep.value.assignedTo = member.name
-    assigningStep.value.assignType = 'self'
-    closeAssignDialog()
-    alert(`已分配給 ${member.name}`)
+    try {
+      const roomId = localStorage.getItem('roomId')
+      await servicesApi.assignService(roomId, {
+        processId: assigningStep.value.id,
+        providerName: member.name,
+        assignType: 'family',
+        assignedUserId: member.id
+      })
+
+      assigningStep.value.assignedTo = member.name
+      assigningStep.value.assignType = 'self'
+      assigningStep.value.assignedUserId = member.id
+      closeAssignDialog()
+      alert(`已分配給 ${member.name}`)
+    } catch (error) {
+      console.error('Assign failed:', error)
+      alert('分配失敗')
+    }
   }
 }
 

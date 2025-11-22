@@ -17,5 +17,13 @@ export const roomsApi = {
    */
   joinRoom(data) {
     return client.post('/rooms/join', data)
+  },
+
+  /**
+   * 取得房間成員
+   * @param {string} roomId
+   */
+  getMembers(roomId) {
+    return client.get(`/rooms/${roomId}/members`)
   }
 }
