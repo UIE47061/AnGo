@@ -10,12 +10,12 @@ const { displayToast } = useToast()
 
 // 流程項目定義
 const processItems = [
-  { id: 1, name: '驗屍' },
-  { id: 2, name: '屍體接運' },
-  { id: 3, name: '入館' },
+  { id: 1, name: '遺體檢驗' },
+  { id: 2, name: '遺體接運' },
+  { id: 3, name: '入館安置' },
   { id: 4, name: '禮儀安排' },
-  { id: 5, name: '許可證申請' },
-  { id: 6, name: '安葬' },
+  { id: 5, name: '許可申請' },
+  { id: 6, name: '安葬作業' },
   { id: 7, name: '後續處理' }
 ]
 
@@ -28,7 +28,7 @@ const companies = ref([
     religion: '佛教',
     features: ['24h支援', '接送服務'],
     details: '永恆禮儀提供24小時客服，專業法事協調，含接送及場地佈置。',
-    providedServices: [2, 3, 4, 6, 7] // 提供：屍體接運、入館、禮儀安排、安葬、後續處理
+    providedServices: [2, 3, 4, 6, 7] // 提供：遺體接運、入館、禮儀安排、安葬、後續處理
   },
   {
     id: 2,
@@ -58,7 +58,7 @@ const companies = ref([
     religion: '佛教',
     features: ['環保葬', '客製化'],
     details: '慈恩禮儀專注於環保自然葬，提供客製化服務方案。',
-    providedServices: [2, 3, 4, 6] // 提供：屍體接運、入館、禮儀安排、安葬
+    providedServices: [2, 3, 4, 6] // 提供：遺體接運、入館、禮儀安排、安葬
   },
   {
     id: 5,
@@ -68,7 +68,7 @@ const companies = ref([
     religion: '道教',
     features: ['傳統儀式', '場地租借'],
     details: '福安殯儀擅長傳統道教儀式，提供完整場地租借服務。',
-    providedServices: [2, 3, 4, 5, 6, 7] // 提供：屍體接運、入館、禮儀安排、許可證申請、安葬、後續處理
+    providedServices: [2, 3, 4, 5, 6, 7] // 提供：遺體接運、入館、禮儀安排、許可證申請、安葬、後續處理
   },
   {
     id: 6,
@@ -78,7 +78,7 @@ const companies = ref([
     religion: '佛教',
     features: ['全套服務', '高品質'],
     details: '龍岩禮儀提供完整一條龍服務，品質優良，服務專業。',
-    providedServices: [2, 3, 4, 5, 6, 7] // 提供：屍體接運、入館、禮儀安排、許可證申請、安葬、後續處理
+    providedServices: [2, 3, 4, 5, 6, 7] // 提供：遺體接運、入館、禮儀安排、許可證申請、安葬、後續處理
   }
 ])
 
