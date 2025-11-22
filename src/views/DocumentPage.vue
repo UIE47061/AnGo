@@ -20,15 +20,46 @@ const roomId = localStorage.getItem('roomId')
 const allDocuments = ref([])
 
 const fetchDocuments = async () => {
-  isLoading.value = true
+  console.log('[DocumentPage] fetchDocuments started')
+  console.log('[DocumentPage] roomId:', roomId)
+
+  if (!roomId) {
+    console.warn('[DocumentPage] No roomId found')
+    displayToast('找不到房間資訊，請重新登入')
+    isLoading.value = false
+    return
+  }
+
   try {
-    // 取得所有文件
-    const response = await documentsApi.getAllDocuments(roomId)
-    allDocuments.value = response.data || []
+    isLoading.value = true
+    console.log('[DocumentPage] Calling documentsApi.getDocuments...')
+    
+    // Use the correct API method name: getDocuments
+    // The client interceptor returns response.data, which is the array of documents
+    const data = await documentsApi.getDocuments(roomId)
+    console.log('[DocumentPage] API Response:', data)
+    
+    // Map backend data to frontend structure
+    // Ensure data is an array before mapping
+    const docs = Array.isArray(data) ? data : []
+    
+    allDocuments.value = docs.map(doc => ({
+      id: doc.id,
+      name: doc.name,
+      category: doc.category,
+      status: doc.status,
+      deadline: doc.deadline ? new Date(doc.deadline).toLocaleDateString() : null,
+      uploadDate: doc.status !== '尚未上傳' ? new Date(doc.updated_at).toLocaleDateString() : null,
+      approveDate: doc.reviewed_at ? new Date(doc.reviewed_at).toLocaleDateString() : null,
+      rejectReason: doc.reject_reason,
+      uploadUrl: doc.upload_url
+    }))
+    console.log('[DocumentPage] Documents mapped:', allDocuments.value)
   } catch (error) {
-    console.error('Fetch documents failed:', error)
-    displayToast('載入文件失敗，請稍後再試')
+    console.error('[DocumentPage] Failed to fetch documents:', error)
+    displayToast('載入文件失敗')
   } finally {
+    console.log('[DocumentPage] Setting isLoading to false')
     isLoading.value = false
   }
 }
