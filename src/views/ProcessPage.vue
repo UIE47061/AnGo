@@ -113,10 +113,10 @@ const processSteps = ref([
   {
     id: 1,
     title: '驗屍檢驗',
-    status: 'completed',
-    date: '2025-11-02',
-    assignedTo: '趙叔',
-    assignType: 'self', // 'self' 自辦, 'vendor' 業者, 'unassigned' 未分配
+    status: 'pending',
+    date: null,
+    assignedTo: null,
+    assignType: 'unassigned', // 'self' 自辦, 'vendor' 業者, 'unassigned' 未分配
     description: '完成死因確認與相關醫療文件取得',
     details: [
       '確認死亡原因',
@@ -127,10 +127,10 @@ const processSteps = ref([
   {
     id: 2,
     title: '遺體接運',
-    status: 'completed',
-    date: '2025-11-03',
-    assignedTo: '龍岩禮儀公司',
-    assignType: 'vendor',
+    status: 'pending',
+    date: null,
+    assignedTo: null,
+    assignType: 'unassigned',
     description: '將往生者遺體安全送至殯儀館',
     details: [
       '遺體接運服務',
@@ -141,10 +141,10 @@ const processSteps = ref([
   {
     id: 3,
     title: '入館安置',
-    status: 'completed',
-    date: '2025-11-04',
-    assignedTo: '龍岩禮儀公司',
-    assignType: 'vendor',
+    status: 'pending',
+    date: null,
+    assignedTo: null,
+    assignType: 'unassigned',
     description: '完成殯儀館入館手續與安置',
     details: [
       '辦理入館登記',
@@ -155,10 +155,10 @@ const processSteps = ref([
   {
     id: 4,
     title: '禮儀安排',
-    status: 'in-progress',
-    date: '2025-11-22',
-    assignedTo: '龍岩禮儀公司',
-    assignType: 'vendor',
+    status: 'pending',
+    date: null,
+    assignedTo: null,
+    assignType: 'unassigned',
     description: '規劃告別式與相關儀式流程',
     details: [
       '確認告別式日期',
@@ -166,8 +166,7 @@ const processSteps = ref([
       '訃聞設計印製',
       '會場佈置規劃',
       '音樂影片製作'
-    ],
-    deadline: '2025-11-25'
+    ]
   },
   {
     id: 5,
