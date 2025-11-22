@@ -36,10 +36,12 @@ const sendMessage = async () => {
   })
 
   try {
+    console.log('[ChatPage] Starting streamAiMessage...')
     await chatApi.streamAiMessage(
       text,
       (chunk) => {
         // onChunk: append text to the last message
+        console.log('[ChatPage] Received chunk:', chunk)
         const msgIndex = chatMessages.value.findIndex(m => m.id === botMsgId)
         if (msgIndex !== -1) {
           chatMessages.value[msgIndex].text += chunk
@@ -48,11 +50,12 @@ const sendMessage = async () => {
       },
       () => {
         // onDone
+        console.log('[ChatPage] Stream done')
         isLoading.value = false
       },
       (error) => {
         // onError
-        console.error(error)
+        console.error('[ChatPage] Stream error:', error)
         const msgIndex = chatMessages.value.findIndex(m => m.id === botMsgId)
         if (msgIndex !== -1) {
           chatMessages.value[msgIndex].text = '抱歉，我現在無法回答您的問題，請稍後再試。'

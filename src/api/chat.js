@@ -73,7 +73,7 @@ export const chatApi = {
         if (done) break
         
         const chunkText = decoder.decode(value, { stream: true })
-        // console.log('[Stream] Received chunk raw:', chunkText)
+        console.log('[Stream] Received chunk raw:', chunkText)
         buffer += chunkText
         const lines = buffer.split('\n')
         
@@ -82,15 +82,18 @@ export const chatApi = {
         
         for (const line of lines) {
           if (line.trim() === '') continue
+          console.log('[Stream] Processing line:', line)
           if (line.startsWith('data: ')) {
             const data = line.slice(6)
             if (data === '[DONE]') {
+              console.log('[Stream] Received DONE signal')
               if (onDone) onDone()
               return
             }
             try {
               const parsed = JSON.parse(data)
               if (parsed.content && onChunk) {
+                console.log('[Stream] Parsed content:', parsed.content)
                 onChunk(parsed.content)
               }
             } catch (e) {
