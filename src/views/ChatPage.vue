@@ -75,6 +75,8 @@ const quickSend = (text) => {
         <button @click="sendMessage" id="send-btn">送出</button>
       </div>
     </div>
+    
+    <BottomNav />
   </div>
 </template>
 
@@ -101,8 +103,10 @@ const quickSend = (text) => {
 .chat-page {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 3.6rem);
+  height: calc(100vh - 3.6rem);
   gap: 12px;
+  position: relative;
+  padding-bottom: 200px;
 }
 
 header {
@@ -136,8 +140,9 @@ header h3 {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow: auto;
+  overflow-y: auto;
   padding: 6px 2px;
+  margin-bottom: auto;
 }
 
 .message-wrapper {
@@ -173,7 +178,15 @@ header h3 {
 .quick-actions {
   display: flex;
   gap: 8px;
-  padding: 0 2px;
+  padding: 8px 2px;
+  background: #f5f5f7;
+  position: fixed;
+  bottom: 155px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 3rem);
+  max-width: 354px;
+  z-index: 15;
 }
 
 .quick-send {
@@ -195,16 +208,22 @@ header h3 {
 }
 
 .chat-input {
-  position: sticky;
-  bottom: 0;
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 3rem);
+  max-width: 354px;
   background: #fff;
   display: flex;
   gap: 8px;
   align-items: center;
-  padding: 12px 8px 20px;
+  padding: 12px;
   border-top: 1px solid #e6e6ee;
   border-radius: 12px;
   margin-bottom: 0;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 15;
 }
 
 .chat-input input {
