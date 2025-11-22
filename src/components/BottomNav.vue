@@ -135,7 +135,7 @@ const navigateTo = (name) => {
 <style scoped>
 .bottom-area {
   position: fixed;
-  bottom: 0px;
+  bottom: -20px;
   left: 0;
   right: 0;
   max-width: 414px;
