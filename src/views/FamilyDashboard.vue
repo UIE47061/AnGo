@@ -15,6 +15,17 @@ const isLoggedIn = ref(false)
 const userName = ref('')
 const roomId = ref('')
 
+// Dashboard Data
+const progressPercent = ref(0)
+const currentStage = ref('載入中...')
+const remainingTasks = ref(0)
+const reminderMessage = ref('')
+const moduleStatus = ref({
+  documents: { status: 'pending' },
+  payments: { status: 'unpaid' },
+  quotes: { status: 'none' }
+})
+
 onMounted(async () => {
   const token = localStorage.getItem('token')
   const userStr = localStorage.getItem('user')
@@ -28,10 +39,31 @@ onMounted(async () => {
     // Fetch dashboard data
     try {
       const data = await dashboardApi.getDashboardData(roomId.value)
-      // Update dashboard state here (omitted for brevity, but ready to use)
       console.log('Dashboard data:', data)
+      
+      // Update state
+      progressPercent.value = data.room.progressPercent
+      currentStage.value = data.room.currentStage || '尚未開始'
+      
+      // Calculate remaining tasks
+      const pendingTasks = data.tasks.filter(t => t.status !== 'completed')
+      remainingTasks.value = pendingTasks.length
+      
+      // Set reminder
+      if (data.reminders && data.reminders.length > 0) {
+        reminderMessage.value = `💡 ${data.reminders[0].message}`
+      } else {
+        reminderMessage.value = '目前沒有新的提醒事項'
+      }
+
+      // Set module status
+      if (data.moduleStatus) {
+        moduleStatus.value = data.moduleStatus
+      }
+
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error)
+      displayToast('無法載入儀表板資料')
     }
   } else {
     // Redirect to login if not logged in
@@ -125,15 +157,15 @@ const handleLogout = () => {
           <div class="progress-left">
             <div class="progress-panel">
               <div class="tag">目前進度</div>
-              <h3>法事準備</h3>
+              <h3>{{ currentStage }}</h3>
               <button class="link-btn">查看詳細任務 →</button>
-              <p class="hint hint-panel">再完成 2 項任務即可結案</p>
+              <p class="hint hint-panel">再完成 {{ remainingTasks }} 項任務即可結案</p>
             </div>
           </div>
 
           <!-- 右側水晶球 -->
           <div class="progress-right">
-            <ProgressCircle :percentage="68" />
+            <ProgressCircle :percentage="progressPercent" />
           </div>
         </div>
 
@@ -156,6 +188,7 @@ const handleLogout = () => {
               </svg>
             </span>
             <span>報價與委託</span>
+            <span v-if="moduleStatus.quotes.status === 'pending'" class="status-dot"></span>
           </button>
           <button class="small-card" @click="navigateToPayment">
             <span class="icon" aria-hidden="true">
@@ -176,6 +209,7 @@ const handleLogout = () => {
               </svg>
             </span>
             <span>金流追蹤</span>
+            <span v-if="moduleStatus.payments.status === 'unpaid'" class="status-dot red"></span>
           </button>
         </div>
       </section>
@@ -202,6 +236,7 @@ const handleLogout = () => {
           </div>
           <h4>文件上傳</h4>
           <p>讓我們協助您完成最後的文件步驟</p>
+          <span v-if="moduleStatus.documents.status === 'pending'" class="status-badge">待處理</span>
         </div>
       </section>
 
@@ -233,7 +268,7 @@ const handleLogout = () => {
         </button>
 
         <div class="reminder-bar">
-          <span>💡 11/25 為補件截止日，記得完成文件上傳</span>
+          <span>{{ reminderMessage }}</span>
         </div>
       </section>
     </main>
@@ -899,6 +934,29 @@ const handleLogout = () => {
   font-size: 0.85rem;
   box-shadow: 0 8px 14px rgba(159, 53, 255, 0.32);
   text-align: center;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #fbbf24; /* Amber for pending */
+  margin-left: auto;
+}
+
+.status-dot.red {
+  background-color: #ef4444; /* Red for unpaid/alert */
+}
+
+.status-badge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background-color: #fee2e2;
+  color: #ef4444;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 </style>
 
