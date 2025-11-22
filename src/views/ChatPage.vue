@@ -32,7 +32,8 @@ const sendMessage = async () => {
   chatMessages.value.push({
     id: botMsgId,
     type: 'bot',
-    text: ''
+    text: '',
+    isThinking: true
   })
 
   try {
@@ -44,7 +45,11 @@ const sendMessage = async () => {
         console.log('[ChatPage] Received chunk:', chunk)
         const msgIndex = chatMessages.value.findIndex(m => m.id === botMsgId)
         if (msgIndex !== -1) {
-          chatMessages.value[msgIndex].text += chunk
+          const msg = chatMessages.value[msgIndex]
+          if (msg.isThinking) {
+            msg.isThinking = false
+          }
+          msg.text += chunk
           scrollToBottom()
         }
       },
@@ -58,7 +63,9 @@ const sendMessage = async () => {
         console.error('[ChatPage] Stream error:', error)
         const msgIndex = chatMessages.value.findIndex(m => m.id === botMsgId)
         if (msgIndex !== -1) {
-          chatMessages.value[msgIndex].text = '抱歉，我現在無法回答您的問題，請稍後再試。'
+          const msg = chatMessages.value[msgIndex]
+          msg.isThinking = false
+          msg.text = '抱歉，我現在無法回答您的問題，請稍後再試。'
         }
         isLoading.value = false
       }
@@ -99,7 +106,8 @@ const quickSend = async (text) => {
       chatMessages.value.push({
         id: botMsgId,
         type: 'bot',
-        text: ''
+        text: '',
+        isThinking: true
       })
 
       await chatApi.streamAiMessage(
@@ -107,7 +115,11 @@ const quickSend = async (text) => {
         (chunk) => {
           const msgIndex = chatMessages.value.findIndex(m => m.id === botMsgId)
           if (msgIndex !== -1) {
-            chatMessages.value[msgIndex].text += chunk
+            const msg = chatMessages.value[msgIndex]
+            if (msg.isThinking) {
+              msg.isThinking = false
+            }
+            msg.text += chunk
             scrollToBottom()
           }
         },
@@ -118,7 +130,9 @@ const quickSend = async (text) => {
           console.error(error)
           const msgIndex = chatMessages.value.findIndex(m => m.id === botMsgId)
           if (msgIndex !== -1) {
-            chatMessages.value[msgIndex].text = '抱歉，查詢失敗，請稍後再試。'
+            const msg = chatMessages.value[msgIndex]
+            msg.isThinking = false
+            msg.text = '抱歉，查詢失敗，請稍後再試。'
           }
           isLoading.value = false
         }
@@ -159,7 +173,14 @@ const scrollToBottom = () => {
           :key="msg.id"
           :class="['message-wrapper', msg.type === 'user' ? 'user' : 'bot']"
         >
-          <div class="message-bubble">{{ msg.text }}</div>
+          <div class="message-bubble">
+            <div v-if="msg.isThinking" class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <span v-else>{{ msg.text }}</span>
+          </div>
         </div>
       </div>
 
@@ -360,5 +381,28 @@ header h3 {
 
 #send-btn:hover {
   background: #7a1fd9;
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.typing-indicator span {
+  width: 6px;
+  height: 6px;
+  background: #9F35FF;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
 }
 </style>
