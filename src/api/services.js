@@ -25,5 +25,15 @@ export const servicesApi = {
    */
   assignService(roomId, service) {
     return this.updateServices(roomId, [service])
+  },
+
+  /**
+   * 更新服務狀態
+   * @param {string} roomId
+   * @param {number} processId
+   * @param {string} status
+   */
+  updateStatus(roomId, processId, status) {
+    return client.patch(`/services/${roomId}/${processId}/status`, { status })
   }
 }

@@ -280,6 +280,18 @@ const expandedStep = ref(null)
 const toggleStep = (stepId) => {
   expandedStep.value = expandedStep.value === stepId ? null : stepId
 }
+
+const updateStepStatus = async (step, newStatus) => {
+  try {
+    const roomId = localStorage.getItem('roomId')
+    await servicesApi.updateStatus(roomId, step.id, newStatus)
+    step.status = newStatus
+    displayToast('狀態已更新')
+  } catch (error) {
+    console.error('Failed to update status:', error)
+    displayToast('更新失敗')
+  }
+}
 </script>
 
 <template>
@@ -411,6 +423,15 @@ const toggleStep = (stepId) => {
 
           <transition name="expand">
             <div v-if="expandedStep === step.id" class="step-details">
+              <div class="status-control">
+                <label>變更狀態：</label>
+                <select :value="step.status" @change="updateStepStatus(step, $event.target.value)" class="status-select">
+                  <option value="pending">待處理</option>
+                  <option value="in-progress">進行中</option>
+                  <option value="completed">已完成</option>
+                </select>
+              </div>
+
               <h4>詳細項目：</h4>
               <ul class="details-list">
                 <li v-for="(detail, idx) in step.details" :key="idx">
@@ -1134,6 +1155,35 @@ const toggleStep = (stepId) => {
 .family-role {
   font-size: 0.8rem;
   color: #999;
+}
+
+.status-control {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-control label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.status-select {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+  background-color: #fff;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.status-select:focus {
+  border-color: #9F35FF;
 }
 
 /* 對話框動畫 */
