@@ -46,6 +46,9 @@ onMounted(async () => {
           if (service.status) {
             step.status = service.status
           }
+          if (service.serviceDate) {
+            step.date = service.serviceDate
+          }
         }
       })
     }
@@ -53,6 +56,44 @@ onMounted(async () => {
     console.error('Failed to fetch data:', error)
   }
 })
+
+// 日期編輯相關狀態
+const showDateDialog = ref(false)
+const editingDateStep = ref(null)
+const tempDate = ref('')
+
+const openDateDialog = (step) => {
+  editingDateStep.value = step
+  tempDate.value = step.date || new Date().toISOString().split('T')[0]
+  showDateDialog.value = true
+}
+
+const closeDateDialog = () => {
+  showDateDialog.value = false
+  editingDateStep.value = null
+  tempDate.value = ''
+}
+
+const saveDate = async () => {
+  if (editingDateStep.value && tempDate.value) {
+    try {
+      const roomId = localStorage.getItem('roomId')
+      await servicesApi.updateStatus(
+        roomId, 
+        editingDateStep.value.id, 
+        editingDateStep.value.status,
+        tempDate.value
+      )
+      
+      editingDateStep.value.date = tempDate.value
+      displayToast('日期已更新')
+      closeDateDialog()
+    } catch (error) {
+      console.error('Failed to update date:', error)
+      displayToast('更新日期失敗')
+    }
+  }
+}
 
 // 分配相關狀態
 const showAssignDialog = ref(false)
@@ -415,8 +456,16 @@ const updateStepStatus = async (step, newStatus) => {
               </div>
               
               <p class="step-description">{{ step.description }}</p>
-              <div v-if="step.date" class="step-date">
-                📅 {{ step.date }}
+              <div 
+                class="step-date clickable" 
+                @click.stop="openDateDialog(step)"
+                :class="{ 'placeholder': !step.date }"
+              >
+                📅 {{ step.date || '設定日期' }}
+                <svg class="edit-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
               </div>
               <div v-if="step.deadline && step.status === 'in-progress'" class="step-deadline">
                 ⚠️ 截止日期：{{ step.deadline }}
@@ -452,6 +501,31 @@ const updateStepStatus = async (step, newStatus) => {
         </div>
       </section>
     </main>
+
+    <!-- 日期編輯對話框 -->
+    <transition name="dialog-fade">
+      <div v-if="showDateDialog" class="dialog-overlay" @click="closeDateDialog">
+        <div class="dialog-content" @click.stop>
+          <div class="dialog-header">
+            <h3>設定日期</h3>
+            <button class="close-btn" @click="closeDateDialog" aria-label="關閉">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="dialog-body">
+            <div class="form-group">
+              <label>選擇日期</label>
+              <input type="date" v-model="tempDate" class="date-input" />
+            </div>
+            <button class="primary-btn" @click="saveDate">確認儲存</button>
+          </div>
+        </div>
+      </div>
+    </transition>
 
     <!-- 共編對話框 -->
     <transition name="dialog-fade">
@@ -847,8 +921,46 @@ const updateStepStatus = async (step, newStatus) => {
 
 .step-date {
   font-size: 0.85rem;
-  color: #94a3b8;
-  margin-top: 0.3rem;
+  color: #666;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.step-date.clickable {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.step-date.clickable:hover {
+  color: #9F35FF;
+}
+
+.step-date.placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.date-input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #666;
+  font-weight: 500;
 }
 
 .step-deadline {

@@ -28,12 +28,13 @@ export const servicesApi = {
   },
 
   /**
-   * 更新服務狀態
+   * 更新服務狀態與日期
    * @param {string} roomId
    * @param {number} processId
    * @param {string} status
+   * @param {string} [serviceDate] - Optional date string (YYYY-MM-DD)
    */
-  updateStatus(roomId, processId, status) {
-    return client.patch(`/services/${roomId}/${processId}/status`, { status })
+  updateStatus(roomId, processId, status, serviceDate) {
+    return client.patch(`/services/${roomId}/${processId}/status`, { status, serviceDate })
   }
 }
