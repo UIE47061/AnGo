@@ -7,7 +7,7 @@ export const documentsApi = {
    * @param {string} [status] - 全部 | 已審核 | 待補件 | 尚未上傳
    */
   getDocuments(roomId, status) {
-    return client.get(`/documents/${roomId}`, {
+    return client.get(`/documents/room/${roomId}`, {
       params: { status }
     })
   },
