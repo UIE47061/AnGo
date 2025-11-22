@@ -94,7 +94,7 @@ const showCompareView = ref(false)
 const filterReligion = ref('全部')
 const filterPriceRange = ref('全部')
 const filterRating = ref('全部')
-const filterProcess = ref('全部') // 新增流程篩選
+const filterProcess = ref('全部')
 
 const religionOptions = ['全部', '佛教', '道教', '無宗教/通用']
 const priceRangeOptions = ['全部', '2萬以下', '2-3萬', '3萬以上']
