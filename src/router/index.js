@@ -18,6 +18,26 @@ const routes = [
     component: () => import('@/views/RegisterPage.vue'),
   },
   {
+    path: '/onboarding/room',
+    name: 'OnboardingRoom',
+    component: () => import('@/views/Onboarding/RoomSelectionPage.vue'),
+  },
+  {
+    path: '/onboarding/faith',
+    name: 'OnboardingFaith',
+    component: () => import('@/views/Onboarding/FaithSelectionPage.vue'),
+  },
+  {
+    path: '/onboarding/relationship',
+    name: 'OnboardingRelationship',
+    component: () => import('@/views/Onboarding/RelationshipPage.vue'),
+  },
+  {
+    path: '/onboarding/basic-info',
+    name: 'OnboardingBasicInfo',
+    component: () => import('@/views/Onboarding/BasicInfoPage.vue'),
+  },
+  {
     path: '/family',
     name: 'FamilyDashboard',
     component: () => import('@/views/FamilyDashboard.vue'),
@@ -67,7 +87,8 @@ const router = createRouter({
 // Global Navigation Guard
 router.beforeEach((to, from, next) => {
   const publicPages = ['/', '/login', '/register']
-  const authRequired = !publicPages.includes(to.path)
+  const onboardingPages = ['/onboarding/room', '/onboarding/faith', '/onboarding/relationship', '/onboarding/basic-info']
+  const authRequired = !publicPages.includes(to.path) && !onboardingPages.includes(to.path)
   const loggedIn = localStorage.getItem('token')
 
   if (authRequired && !loggedIn) {

@@ -29,11 +29,19 @@ const handleLogin = async () => {
     localStorage.setItem('user', JSON.stringify(res.user))
     localStorage.setItem('familyId', res.user.familyId)
 
-    // Redirect based on role (simplified for now)
-    if (res.user.role === 'family_member') {
-      router.push('/family')
+    // Check if user completed onboarding
+    const onboardingCompleted = localStorage.getItem('onboardingCompleted')
+    
+    if (!onboardingCompleted) {
+      // First time login - go to onboarding
+      router.push('/onboarding/room')
     } else {
-      router.push('/provider')
+      // Returning user - go to dashboard
+      if (res.user.role === 'family_member') {
+        router.push('/family')
+      } else {
+        router.push('/provider')
+      }
     }
   } catch (error) {
     console.error(error)
