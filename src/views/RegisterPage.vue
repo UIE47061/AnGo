@@ -35,7 +35,6 @@ const handleRegister = async () => {
     // Save token and user info (Auto login)
     localStorage.setItem('token', res.token)
     localStorage.setItem('user', JSON.stringify(res.user))
-    localStorage.setItem('familyId', res.user.familyId)
 
     // Redirect to onboarding
     router.push('/onboarding/room')

@@ -32,10 +32,6 @@ const handleLogin = async () => {
       localStorage.setItem('roomId', res.user.roomId)
     }
 
-    if (res.user.familyId) {
-      localStorage.setItem('familyId', res.user.familyId)
-    }
-
     // Check if user has a room
     if (res.user.roomId) {
       // Has room - go to dashboard

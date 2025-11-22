@@ -3,24 +3,24 @@ import client from './client'
 export const chatApi = {
   /**
    * 獲取聊天記錄
-   * @param {string} familyId
+   * @param {string} roomId
    * @param {Object} params
    * @param {number} [params.limit]
    * @param {number|string} [params.before]
    */
-  getMessages(familyId, params) {
-    return client.get(`/messages/${familyId}`, { params })
+  getMessages(roomId, params) {
+    return client.get(`/messages/${roomId}`, { params })
   },
 
   /**
    * 發送訊息
-   * @param {string} familyId
+   * @param {string} roomId
    * @param {Object} data
    * @param {string} data.content
    * @param {string} data.senderType - family | assistant | provider
    */
-  sendMessage(familyId, data) {
-    return client.post(`/messages/${familyId}`, data)
+  sendMessage(roomId, data) {
+    return client.post(`/messages/${roomId}`, data)
   },
 
   /**

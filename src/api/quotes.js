@@ -21,14 +21,14 @@ export const quotesApi = {
 
   /**
    * 委託廠商
-   * @param {string} familyId
+   * @param {string} roomId
    * @param {number|string} quoteId
    * @param {Object} data
    * @param {string} data.notes
    */
-  commissionQuote(familyId, quoteId, data) {
+  commissionQuote(roomId, quoteId, data) {
     return client.post('/quotes/requests', {
-      familyId,
+      roomId,
       quoteId,
       notes: data.notes
     })

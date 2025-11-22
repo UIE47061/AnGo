@@ -10,7 +10,7 @@ const showUserMenu = ref(false)
 const showUserOverlay = ref(false)
 const isLoggedIn = ref(false)
 const userName = ref('')
-const familyId = ref('')
+const roomId = ref('')
 
 onMounted(async () => {
   const token = localStorage.getItem('token')
@@ -20,11 +20,11 @@ onMounted(async () => {
     const user = JSON.parse(userStr)
     isLoggedIn.value = true
     userName.value = user.name
-    familyId.value = user.familyId
+    roomId.value = user.roomId || localStorage.getItem('roomId')
     
     // Fetch dashboard data
     try {
-      const data = await dashboardApi.getDashboardData(familyId.value)
+      const data = await dashboardApi.getDashboardData(roomId.value)
       // Update dashboard state here (omitted for brevity, but ready to use)
       console.log('Dashboard data:', data)
     } catch (error) {
@@ -73,7 +73,7 @@ const handleLogout = () => {
   if (confirm('確定要登出嗎？')) {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    localStorage.removeItem('familyId')
+    localStorage.removeItem('roomId')
     isLoggedIn.value = false
     userName.value = ''
     closeOverlay()
