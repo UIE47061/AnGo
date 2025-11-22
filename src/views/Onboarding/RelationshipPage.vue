@@ -4,6 +4,18 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const selectedRelationship = ref('')
+const otherRelationshipText = ref('')
+
+const toastMessage = ref('')
+const showToast = ref(false)
+
+const displayToast = (message) => {
+  toastMessage.value = message
+  showToast.value = true
+  setTimeout(() => {
+    showToast.value = false
+  }, 1000)
+}
 
 const relationshipOptions = [
   { 
@@ -28,16 +40,25 @@ const relationshipOptions = [
 
 const selectRelationship = (relationship) => {
   selectedRelationship.value = relationship
+  if (relationship !== 'other') {
+    otherRelationshipText.value = ''
+  }
 }
 
 const nextStep = () => {
   if (!selectedRelationship.value) {
-    alert('請選擇關係')
+    displayToast('請選擇關係')
+    return
+  }
+  
+  if (selectedRelationship.value === 'other' && !otherRelationshipText.value.trim()) {
+    displayToast('請輸入關係')
     return
   }
   
   // 儲存選擇
-  localStorage.setItem('relationship', selectedRelationship.value)
+  const relationshipValue = selectedRelationship.value === 'other' ? otherRelationshipText.value : selectedRelationship.value
+  localStorage.setItem('relationship', relationshipValue)
   
   // 前往下一步
   router.push({ name: 'OnboardingBasicInfo' })
@@ -100,11 +121,31 @@ const goBack = () => {
         </button>
       </div>
 
+      <!-- 其他關係輸入框 -->
+      <transition name="input-fade">
+        <div v-if="selectedRelationship === 'other'" class="other-input-wrapper">
+          <input
+            v-model="otherRelationshipText"
+            type="text"
+            placeholder="請輸入關係"
+            class="other-input"
+            maxlength="50"
+          />
+        </div>
+      </transition>
+
       <div class="actions">
         <button class="back-btn" @click="goBack">返回</button>
         <button class="next-btn" @click="nextStep">下一步</button>
       </div>
     </div>
+
+    <!-- Toast 提示框 -->
+    <transition name="toast-fade">
+      <div v-if="showToast" class="toast">
+        {{ toastMessage }}
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -314,5 +355,80 @@ h2 {
 .next-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(159, 53, 255, 0.3);
+}
+
+/* 其他選項輸入框 */
+.other-input-wrapper {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.other-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #9F35FF;
+  border-radius: 12px;
+  font-size: 1rem;
+  color: #2b2b3a;
+  background: #faf5ff;
+  transition: all 0.2s ease;
+}
+
+.other-input:focus {
+  outline: none;
+  border-color: #7a1fd9;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(159, 53, 255, 0.1);
+}
+
+.other-input::placeholder {
+  color: #b8b8c8;
+}
+
+.input-fade-enter-active,
+.input-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.input-fade-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.input-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Toast 提示框樣式 */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #9F35FF, #b35aff);
+  color: #ffffff;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(159, 53, 255, 0.4);
+  z-index: 2000;
+  white-space: nowrap;
+}
+
+.toast-fade-enter-active,
+.toast-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.toast-fade-enter-from {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
+}
+
+.toast-fade-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
 }
 </style>

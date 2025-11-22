@@ -10,6 +10,17 @@ const formData = ref({
   deathDate: ''
 })
 
+const toastMessage = ref('')
+const showToast = ref(false)
+
+const displayToast = (message) => {
+  toastMessage.value = message
+  showToast.value = true
+  setTimeout(() => {
+    showToast.value = false
+  }, 1000)
+}
+
 const formatDate = (event, field) => {
   // 自動格式化日期輸入
   const input = event.target
@@ -27,17 +38,17 @@ const formatDate = (event, field) => {
 
 const validateForm = () => {
   if (!formData.value.name.trim()) {
-    alert('請輸入姓名')
+    displayToast('請輸入姓名')
     return false
   }
   
   if (!formData.value.birthDate) {
-    alert('請選擇出生日期')
+    displayToast('請選擇出生日期')
     return false
   }
   
   if (!formData.value.deathDate) {
-    alert('請選擇離世日期')
+    displayToast('請選擇離世日期')
     return false
   }
   
@@ -46,7 +57,7 @@ const validateForm = () => {
   const deathDate = new Date(formData.value.deathDate)
   
   if (deathDate <= birthDate) {
-    alert('離世日期必須晚於出生日期')
+    displayToast('離世日期必須晚於出生日期')
     return false
   }
   
@@ -169,6 +180,13 @@ const goBack = () => {
         <button class="complete-btn" @click="completeOnboarding">完成設定</button>
       </div>
     </div>
+
+    <!-- Toast 提示框 -->
+    <transition name="toast-fade">
+      <div v-if="showToast" class="toast">
+        {{ toastMessage }}
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -384,5 +402,37 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 input[type="date"] {
   padding-right: 3rem;
+}
+
+/* Toast 提示框樣式 */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #9F35FF, #b35aff);
+  color: #ffffff;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(159, 53, 255, 0.4);
+  z-index: 2000;
+  white-space: nowrap;
+}
+
+.toast-fade-enter-active,
+.toast-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.toast-fade-enter-from {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
+}
+
+.toast-fade-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
 }
 </style>
