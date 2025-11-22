@@ -8,12 +8,15 @@ import { roomsApi } from '@/api/rooms'
 
 const router = useRouter()
 const roomId = ref(localStorage.getItem('roomId'))
+import Toast from '@/components/Toast.vue'
+import { useToast } from '@/composables/useToast'
+import { dashboardApi } from '@/api/dashboard'
+
+const { displayToast } = useToast()
 
 // 共編相關狀態
 const showShareDialog = ref(false)
-const shareMode = ref('generate') // 'generate' 或 'input'
 const shareCode = ref('')
-const inputCode = ref('')
 
 // 新增活動相關狀態
 const showEventDialog = ref(false)
@@ -33,7 +36,7 @@ const calendarEvents = ref([])
 
 onMounted(async () => {
   if (!roomId.value) {
-    alert('請先登入或加入房間')
+    displayToast('請先登入或加入房間')
     router.push('/login')
     return
   }
@@ -60,10 +63,18 @@ const fetchCollaborators = async () => {
   }
 }
 
-const openShareDialog = () => {
+const openShareDialog = async () => {
   showShareDialog.value = true
-  shareMode.value = 'generate'
-  inputCode.value = ''
+  // 從 API 載入房間代碼
+  try {
+    const roomId = localStorage.getItem('roomId')
+    if (roomId) {
+      const res = await dashboardApi.getDashboardData(roomId)
+      shareCode.value = res.room.roomCode
+    }
+  } catch (error) {
+    console.error('Failed to fetch room code:', error)
+  }
 }
 
 const closeShareDialog = () => {
@@ -78,14 +89,14 @@ const generateShareCode = async () => {
     shareCode.value = res.code
   } catch (error) {
     console.error(error)
-    alert('無法取得共編代碼')
+    displayToast('無法取得共編代碼')
   }
 }
 
 const copyShareCode = () => {
   if (shareCode.value) {
     navigator.clipboard.writeText(shareCode.value)
-    alert('代碼已複製到剪貼簿！')
+    displayToast('代碼已複製到剪貼簿！')
   }
 }
 
@@ -93,16 +104,16 @@ const joinWithCode = async () => {
   if (inputCode.value.trim()) {
     try {
       await roomsApi.joinRoom({ roomCode: inputCode.value })
-      alert('成功加入房間！')
+      displayToast('成功加入房間！')
       // Refresh data or reload page
       window.location.reload()
     } catch (error) {
       console.error(error)
-      alert(error.response?.data?.message || '加入失敗，請檢查代碼')
+      displayToast(error.response?.data?.message || '加入失敗，請檢查代碼')
     }
     closeShareDialog()
   } else {
-    alert('請輸入共編代碼')
+    displayToast('請輸入共編代碼')
   }
 }
 
@@ -149,7 +160,7 @@ const toggleParticipant = (userId) => {
 // 儲存新活動
 const saveNewEvent = async () => {
   if (!newEvent.value.title.trim()) {
-    alert('請輸入活動標題')
+    displayToast('請輸入活動標題')
     return
   }
   
@@ -166,10 +177,10 @@ const saveNewEvent = async () => {
     await fetchEvents() // Refresh list
     
     closeEventDialog()
-    alert('活動已新增！')
+    displayToast('活動已新增！')
   } catch (error) {
     console.error(error)
-    alert('新增活動失敗')
+    displayToast('新增活動失敗')
   }
 }
 </script>
@@ -318,74 +329,28 @@ const saveNewEvent = async () => {
             </button>
           </div>
 
-          <!-- 模式切換 -->
-          <div class="mode-tabs">
-            <button 
-              class="mode-tab"
-              :class="{ active: shareMode === 'generate' }"
-              @click="switchMode('generate')"
-            >
-              生成代碼
-            </button>
-            <button 
-              class="mode-tab"
-              :class="{ active: shareMode === 'input' }"
-              @click="switchMode('input')"
-            >
-              輸入代碼
-            </button>
-          </div>
-
-          <!-- 生成代碼模式 -->
-          <div v-if="shareMode === 'generate'" class="dialog-body">
-            <p class="instruction">生成共編代碼，分享給其他人加入此行事曆</p>
+          <div class="dialog-body">
+            <p class="instruction">分享此代碼給其他人，一起管理行事曆</p>
             
-            <div v-if="!shareCode" class="generate-section">
-              <button class="primary-btn" @click="generateShareCode">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                生成共編代碼
-              </button>
-            </div>
-
-            <div v-else class="code-display">
+            <div class="code-display">
               <div class="code-box">
-                <span class="code-text">{{ shareCode }}</span>
+                <span class="code-text">{{ shareCode || '載入中...' }}</span>
               </div>
-              <button class="copy-btn" @click="copyShareCode">
+              <button class="copy-btn" @click="copyShareCode" :disabled="!shareCode">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                 </svg>
                 複製代碼
               </button>
-              <p class="hint-text">此代碼有效期限為 24 小時</p>
-            </div>
-          </div>
-
-          <!-- 輸入代碼模式 -->
-          <div v-else class="dialog-body">
-            <p class="instruction">輸入共編代碼以加入他人的行事曆</p>
-            
-            <div class="input-section">
-              <input 
-                v-model="inputCode"
-                type="text"
-                placeholder="請輸入 6 位代碼"
-                maxlength="6"
-                class="code-input"
-              />
-              <button class="primary-btn" @click="joinWithCode">
-                加入共編
-              </button>
+              <p class="hint-text">分享此代碼即可邀請其他人加入共編</p>
             </div>
           </div>
         </div>
       </div>
     </transition>
 
+    <Toast />
     <BottomNav />
   </div>
 </template>
