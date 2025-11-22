@@ -77,6 +77,11 @@ const routes = [
     name: 'Payment',
     component: () => import('@/views/PaymentPage.vue'),
   },
+  {
+    path: '/back',
+    name: 'BackPage',
+    component: () => import('@/views/BackPage.vue'),
+  },
 ]
 
 const router = createRouter({
