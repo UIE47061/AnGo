@@ -96,8 +96,14 @@ router.beforeEach((to, from, next) => {
   const authRequired = !publicPages.includes(to.path) && !onboardingPages.includes(to.path)
   const loggedIn = localStorage.getItem('token')
 
+  // 1. Redirect to login if trying to access protected route without token
   if (authRequired && !loggedIn) {
     return next('/login')
+  }
+
+  // 2. Redirect to dashboard if trying to access login/welcome while logged in
+  if (loggedIn && (to.path === '/login' || to.path === '/')) {
+    return next('/family')
   }
 
   next()
