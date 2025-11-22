@@ -11,7 +11,7 @@ const props = defineProps({
 const emit = defineEmits(['date-click'])
 
 const activeFilter = ref('全部')
-const filters = ['全部', '行政', '禮儀']
+const filters = ['全部', '行政', '禮儀', '流程']
 
 // 取得今天的日期
 const today = new Date()
@@ -80,8 +80,8 @@ const generateCalendarDays = () => {
   // 填充實際日期
   for (let day = 1; day <= daysInMonth; day++) {
     const dayEvents = filteredEvents.value.filter(event => {
-      const eventDay = parseInt(event.date.split('-')[2])
-      return eventDay === day
+      const [eYear, eMonth, eDay] = event.date.split('-').map(Number)
+      return eYear === currentYear && eMonth === currentMonth && eDay === day
     })
     days.push({ day, events: dayEvents })
   }
@@ -98,6 +98,8 @@ const getCategoryColor = (category) => {
       return '#3b82f6' // 藍色
     case '禮儀':
       return '#f59e0b' // 橘色
+    case '流程':
+      return '#10b981' // 綠色 (Process items)
     default:
       return '#9F35FF' // 紫色
   }
@@ -110,6 +112,8 @@ const getCategoryBgColor = (category) => {
       return '#dbeafe'
     case '禮儀':
       return '#fef3c7'
+    case '流程':
+      return '#d1fae5'
     default:
       return '#f3e8ff'
   }

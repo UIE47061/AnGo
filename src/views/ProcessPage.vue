@@ -291,22 +291,23 @@ const assignToVendor = () => {
 
 const assignToFamily = async (member) => {
   if (assigningStep.value) {
-    assigningStep.value.assignedTo = member.name
-    assigningStep.value.assignType = 'self'
-    closeAssignDialog()
-    displayToast(`已分配給 ${member.name}`)
+    // Store reference before closing dialog
+    const stepToUpdate = assigningStep.value
+    
     try {
       const roomId = localStorage.getItem('roomId')
       await servicesApi.assignService(roomId, {
-        processId: assigningStep.value.id,
+        processId: stepToUpdate.id,
         providerName: member.name,
         assignType: 'family',
         assignedUserId: member.id
       })
 
-      assigningStep.value.assignedTo = member.name
-      assigningStep.value.assignType = 'self'
-      assigningStep.value.assignedUserId = member.id
+      // Update UI
+      stepToUpdate.assignedTo = member.name
+      stepToUpdate.assignType = 'self'
+      stepToUpdate.assignedUserId = member.id
+      
       closeAssignDialog()
       displayToast(`已分配給 ${member.name}`)
     } catch (error) {
