@@ -116,7 +116,7 @@ const familyMembers = ref([
 const processSteps = ref([
   {
     id: 1,
-    title: '驗屍檢驗',
+    title: '遺體檢驗',
     status: 'pending',
     date: null,
     assignedTo: null,

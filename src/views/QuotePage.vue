@@ -274,7 +274,7 @@ const confirmServices = async () => {
   
   const roomId = localStorage.getItem('roomId')
   if (!roomId) {
-    displayToast('請先登入或加入房間')
+    displayToast('請先登入或加入協作')
     return
   }
 

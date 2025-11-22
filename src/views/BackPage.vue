@@ -307,7 +307,7 @@ const handleChartClick = (category) => {
 
 // --- 圖表數據 (Mock Data) ---
 const funnelData = {
-  labels: ['1.驗屍', '2.接運', '3.入館', '4.禮儀', '5.許可', '6.安葬', '7.後續'],
+  labels: ['1.遺體', '2.接運', '3.入館', '4.禮儀', '5.許可', '6.安葬', '7.後續'],
   datasets: [
     { label: '民眾自辦', backgroundColor: '#2ca02c', data: [15, 10, 20, 45, 85, 30, 70], borderRadius: 0, barPercentage: 0.6 },
     { label: '委託業者', backgroundColor: '#ff7f0e', data: [85, 90, 80, 55, 15, 70, 30], borderRadius: 0, barPercentage: 0.6 }
@@ -316,7 +316,7 @@ const funnelData = {
 const funnelOptions = { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, max: 100, ticks: { callback: v => v + '%' } } }, plugins: { legend: { position: 'bottom' } } }
 
 const timeSpentData = {
-  labels: ['驗屍', '接運', '入館', '禮儀', '許可', '安葬', '後續'],
+  labels: ['遺體', '接運', '入館', '禮儀', '許可', '安葬', '後續'],
   datasets: [{
     label: '平均停留時間 (分鐘)',
     borderColor: '#3B82F6', backgroundColor: 'rgba(59, 130, 246, 0.1)',

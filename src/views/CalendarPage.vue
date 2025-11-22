@@ -36,7 +36,7 @@ const calendarEvents = ref([])
 
 onMounted(async () => {
   if (!roomId.value) {
-    displayToast('請先登入或加入房間')
+    displayToast('請先登入或加入協作')
     router.push('/login')
     return
   }
@@ -65,7 +65,7 @@ const fetchCollaborators = async () => {
 
 const openShareDialog = async () => {
   showShareDialog.value = true
-  // 從 API 載入房間代碼
+  // 從 API 載入協作代碼
   try {
     const roomId = localStorage.getItem('roomId')
     if (roomId) {
@@ -104,7 +104,7 @@ const joinWithCode = async () => {
   if (inputCode.value.trim()) {
     try {
       await roomsApi.joinRoom({ roomCode: inputCode.value })
-      displayToast('成功加入房間！')
+      displayToast('成功加入協作！')
       // Refresh data or reload page
       window.location.reload()
     } catch (error) {

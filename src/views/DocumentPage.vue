@@ -25,7 +25,7 @@ const fetchDocuments = async () => {
 
   if (!roomId) {
     console.warn('[DocumentPage] No roomId found')
-    displayToast('找不到房間資訊，請重新登入')
+    displayToast('找不到協作資訊，請重新登入')
     isLoading.value = false
     return
   }

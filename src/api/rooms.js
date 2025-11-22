@@ -2,7 +2,7 @@ import client from './client'
 
 export const roomsApi = {
   /**
-   * 建立房間
+   * 建立協作
    * @param {Object} data
    * @param {string} data.displayName
    */
@@ -11,7 +11,7 @@ export const roomsApi = {
   },
 
   /**
-   * 加入房間
+   * 加入協作
    * @param {Object} data
    * @param {string} data.roomCode
    */
@@ -20,7 +20,7 @@ export const roomsApi = {
   },
 
   /**
-   * 取得房間成員
+   * 取得協作成員
    * @param {string} roomId
    */
   getMembers(roomId) {

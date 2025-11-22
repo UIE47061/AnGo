@@ -30,7 +30,7 @@ const closeDialog = () => {
 
 const submitCreateRoom = async () => {
   if (!roomName.value.trim()) {
-    displayToast('請輸入房間名稱')
+    displayToast('請輸入協作名稱')
     return
   }
 
@@ -49,7 +49,7 @@ const submitCreateRoom = async () => {
     router.push({ name: 'OnboardingFaith' })
   } catch (error) {
     console.error(error)
-    displayToast(error.response?.data?.message || '建立房間失敗')
+    displayToast(error.response?.data?.message || '建立協作失敗')
   } finally {
     isLoading.value = false
   }
@@ -72,12 +72,12 @@ const submitRoomCode = async () => {
       router.push({ name: 'FamilyDashboard' })
     } catch (error) {
       console.error(error)
-      displayToast(error.response?.data?.message || '加入房間失敗')
+      displayToast(error.response?.data?.message || '加入協作失敗')
     } finally {
       isLoading.value = false
     }
   } else {
-    displayToast('請輸入房間代碼')
+    displayToast('請輸入協作代碼')
   }
 }
 </script>
@@ -115,7 +115,7 @@ const submitRoomCode = async () => {
               <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
           </div>
-          <h3>創建新房間</h3>
+          <h3>創建新協作</h3>
           <p>開始規劃新的儀式流程</p>
         </button>
 
@@ -126,13 +126,13 @@ const submitRoomCode = async () => {
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
             </svg>
           </div>
-          <h3>加入現有房間</h3>
+          <h3>加入現有協作</h3>
           <p>加入家人已建立的規劃</p>
         </button>
       </div>
     </div>
 
-    <!-- 創建房間對話框 -->
+    <!-- 創建協作對話框 -->
     <transition name="dialog-fade">
       <div v-if="showCreateDialog" class="dialog-overlay" @click.self="closeDialog">
         <div class="dialog-content">
@@ -143,13 +143,13 @@ const submitRoomCode = async () => {
             </svg>
           </button>
 
-          <h3>創建新房間</h3>
-          <p>請為您的房間命名（例如：王大明家屬）</p>
+          <h3>創建新協作</h3>
+          <p>請為您的協作命名（例如：王大明家屬）</p>
 
           <input
             v-model="roomName"
             type="text"
-            placeholder="輸入房間名稱"
+            placeholder="輸入協作名稱"
             class="code-input"
             style="letter-spacing: normal; text-align: left;"
             @keyup.enter="submitCreateRoom"
@@ -162,7 +162,7 @@ const submitRoomCode = async () => {
       </div>
     </transition>
 
-    <!-- 加入房間對話框 -->
+    <!-- 加入協作對話框 -->
     <transition name="dialog-fade">
       <div v-if="showJoinDialog" class="dialog-overlay" @click.self="closeDialog">
         <div class="dialog-content">
@@ -173,7 +173,7 @@ const submitRoomCode = async () => {
             </svg>
           </button>
 
-          <h3>加入房間</h3>
+          <h3>加入協作</h3>
           <p>請輸入由家人提供的共編代碼</p>
 
           <input

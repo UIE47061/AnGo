@@ -1,9 +1,9 @@
 const allDocuments = ([
-  // 1. 驗屍檢驗
-  { id: 1, name: '逗者身分證', status: '已審核', approveDate: '2025/11/15', uploadDate: '2025/11/12', category: '1. 驗屍檢驗', processId: 1 },
-  { id: 2, name: '健保卡', status: '已審核', approveDate: '2025/11/14', uploadDate: '2025/11/10', category: '1. 驗屍檢驗', processId: 1 },
-  { id: 3, name: '家屬身分證', status: '已審核', approveDate: '2025/11/16', uploadDate: '2025/11/13', category: '1. 驗屍檢驗', processId: 1 },
-  { id: 4, name: '死亡診斷書', status: '已審核', approveDate: '2025/11/13', uploadDate: '2025/11/09', category: '1. 驗屍檢驗', processId: 1 },
+  // 1. 遺體檢驗
+  { id: 1, name: '逗者身分證', status: '已審核', approveDate: '2025/11/15', uploadDate: '2025/11/12', category: '1. 遺體檢驗', processId: 1 },
+  { id: 2, name: '健保卡', status: '已審核', approveDate: '2025/11/14', uploadDate: '2025/11/10', category: '1. 遺體檢驗', processId: 1 },
+  { id: 3, name: '家屬身分證', status: '已審核', approveDate: '2025/11/16', uploadDate: '2025/11/13', category: '1. 遺體檢驗', processId: 1 },
+  { id: 4, name: '死亡診斷書', status: '已審核', approveDate: '2025/11/13', uploadDate: '2025/11/09', category: '1. 遺體檢驗', processId: 1 },
   
   // 2. 遗體接運
   { id: 5, name: '死亡證明', status: '已審核', approveDate: '2025/11/14', uploadDate: '2025/11/10', category: '2. 遗體接運', processId: 2 },

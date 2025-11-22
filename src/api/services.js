@@ -2,7 +2,7 @@ import client from './client'
 
 export const servicesApi = {
   /**
-   * 獲取房間已分配的服務
+   * 獲取協作已分配的服務
    * @param {string} roomId
    */
   getServices(roomId) {
@@ -10,7 +10,7 @@ export const servicesApi = {
   },
 
   /**
-   * 更新房間已分配的服務
+   * 更新協作已分配的服務
    * @param {string} roomId
    * @param {Array<{processId: number, providerName: string, assignType?: string, assignedUserId?: string}>} services
    */
