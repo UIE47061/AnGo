@@ -28,7 +28,7 @@ const familyMembers = ref([
 const processSteps = ref([
   {
     id: 1,
-    title: '驗屍',
+    title: '驗屍檢驗',
     status: 'completed',
     date: '2025-11-02',
     assignedTo: '趙叔',
@@ -42,7 +42,7 @@ const processSteps = ref([
   },
   {
     id: 2,
-    title: '屍體接運',
+    title: '遺體接運',
     status: 'completed',
     date: '2025-11-03',
     assignedTo: '龍岩禮儀公司',
@@ -56,7 +56,7 @@ const processSteps = ref([
   },
   {
     id: 3,
-    title: '入館',
+    title: '入館安置',
     status: 'completed',
     date: '2025-11-04',
     assignedTo: '龍岩禮儀公司',
@@ -87,7 +87,7 @@ const processSteps = ref([
   },
   {
     id: 5,
-    title: '許可證申請',
+    title: '許可申請',
     status: 'pending',
     date: null,
     assignedTo: null,
@@ -103,7 +103,7 @@ const processSteps = ref([
   },
   {
     id: 6,
-    title: '安葬',
+    title: '安葬作業',
     status: 'pending',
     date: null,
     assignedTo: null,
