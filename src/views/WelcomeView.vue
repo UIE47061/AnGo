@@ -5,11 +5,11 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const handleFamilyEntry = () => {
-  router.push('/family')
+  router.push('/login')
 }
 
 const handleProviderEntry = () => {
-  router.push('/provider')
+  router.push('/login')
 }
 </script>
 

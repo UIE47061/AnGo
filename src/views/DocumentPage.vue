@@ -4,33 +4,102 @@ import BottomNav from '@/components/BottomNav.vue'
 
 const activeTab = ref('全部')
 const tabs = ['全部', '已審核', '待補件', '尚未上傳']
+const sortBy = ref('狀態') // '狀態' 或 '日期'
+const sortOptions = ['狀態', '日期']
 
 // 所有文件的完整列表
 const allDocuments = ref([
-  { id: 1, name: '死亡證明書', status: '尚未上傳', deadline: '2025/11/25', category: '必要文件' },
-  { id: 2, name: '除戶謄本', status: '尚未上傳', deadline: '2025/11/30', category: '必要文件' },
-  { id: 3, name: '戶籍謄本', status: '已審核', approveDate: '2025/11/14', uploadDate: '2025/11/10', category: '必要文件' },
-  { id: 4, name: '身分證影本（亡者）', status: '已審核', approveDate: '2025/11/15', uploadDate: '2025/11/12', category: '身份證明' },
-  { id: 5, name: '身分證影本（申請人）', status: '已審核', approveDate: '2025/11/16', uploadDate: '2025/11/13', category: '身份證明' },
-  { id: 6, name: '火化許可證', status: '待補件', uploadDate: '2025/11/10', rejectReason: '文件模糊，請重新上傳清晰版本', category: '火化相關' },
-  { id: 7, name: '安葬許可證', status: '待補件', uploadDate: '2025/11/11', rejectReason: '缺少簽章', category: '安葬相關' },
-  { id: 8, name: '醫院診斷證明', status: '已審核', approveDate: '2025/11/13', uploadDate: '2025/11/09', category: '醫療文件' },
-  { id: 9, name: '健保卡（亡者）', status: '尚未上傳', deadline: '2025/11/28', category: '健保相關' },
-  { id: 10, name: '土地使用同意書', status: '已審核', approveDate: '2025/11/12', uploadDate: '2025/11/08', category: '安葬相關' }
+  // 1. 驗屍檢驗
+  { id: 1, name: '逗者身分證', status: '已審核', approveDate: '2025/11/15', uploadDate: '2025/11/12', category: '1. 驗屍檢驗', processId: 1 },
+  { id: 2, name: '健保卡', status: '已審核', approveDate: '2025/11/14', uploadDate: '2025/11/10', category: '1. 驗屍檢驗', processId: 1 },
+  { id: 3, name: '家屬身分證', status: '已審核', approveDate: '2025/11/16', uploadDate: '2025/11/13', category: '1. 驗屍檢驗', processId: 1 },
+  { id: 4, name: '死亡診斷書', status: '已審核', approveDate: '2025/11/13', uploadDate: '2025/11/09', category: '1. 驗屍檢驗', processId: 1 },
+  
+  // 2. 遗體接運
+  { id: 5, name: '死亡證明', status: '已審核', approveDate: '2025/11/14', uploadDate: '2025/11/10', category: '2. 遗體接運', processId: 2 },
+  { id: 6, name: '殡葬設施使用申請表', status: '已審核', approveDate: '2025/11/15', uploadDate: '2025/11/11', category: '2. 遗體接運', processId: 2 },
+  
+  // 3. 入館安置
+  { id: 7, name: '冷凍室使用紀錄', status: '已審核', approveDate: '2025/11/16', uploadDate: '2025/11/12', category: '3. 入館安置', processId: 3 },
+  { id: 8, name: '入斂申請表', status: '已審核', approveDate: '2025/11/17', uploadDate: '2025/11/13', category: '3. 入館安置', processId: 3 },
+  { id: 9, name: '靈堂使用申請表', status: '待補件', uploadDate: '2025/11/14', rejectReason: '缺少簽章', category: '3. 入館安置', processId: 3 },
+  
+  // 4. 禮儀安排
+  { id: 10, name: '遗照照片', status: '已審核', approveDate: '2025/11/18', uploadDate: '2025/11/15', category: '4. 禮儀安排', processId: 4 },
+  { id: 11, name: '委託書', status: '已審核', approveDate: '2025/11/19', uploadDate: '2025/11/16', category: '4. 禮儀安排', processId: 4 },
+  
+  // 5. 許可申請
+  { id: 12, name: '火化申請表', status: '尚未上傳', deadline: '2025/11/25', category: '5. 許可申請', processId: 5 },
+  { id: 13, name: '印章', status: '已審核', approveDate: '2025/11/17', uploadDate: '2025/11/14', category: '5. 許可申請', processId: 5 },
+  
+  // 6. 安葬作業
+  { id: 14, name: '火化許可證', status: '待補件', uploadDate: '2025/11/10', rejectReason: '文件模糊，請重新上傳清晰版本', category: '6. 安葬作業', processId: 6 },
+  { id: 15, name: '骨灰（骼）存放申請書', status: '尚未上傳', deadline: '2025/11/26', category: '6. 安葬作業', processId: 6 },
+  { id: 16, name: '土地使用同意書', status: '已審核', approveDate: '2025/11/12', uploadDate: '2025/11/08', category: '6. 安葬作業', processId: 6 },
+  
+  // 7. 後續處理
+  { id: 17, name: '戶口名簿', status: '尚未上傳', deadline: '2025/11/30', category: '7. 後續處理', processId: 7 },
+  { id: 18, name: '保單', status: '已審核', approveDate: '2025/11/18', uploadDate: '2025/11/15', category: '7. 後續處理', processId: 7 },
+  { id: 19, name: '財產清冊', status: '尚未上傳', deadline: '2025/12/15', category: '7. 後續處理', processId: 7 },
+  { id: 20, name: '家庭戶籍謄本', status: '尚未上傳', deadline: '2025/12/10', category: '7. 後續處理', processId: 7 }
 ])
 
 // 根據選中的標籤過濾文件
 const documents = computed(() => {
+  let filtered = []
+  
   if (activeTab.value === '全部') {
-    return allDocuments.value
+    filtered = allDocuments.value
   } else if (activeTab.value === '已審核') {
-    return allDocuments.value.filter(doc => doc.status === '已審核')
+    filtered = allDocuments.value.filter(doc => doc.status === '已審核')
   } else if (activeTab.value === '待補件') {
-    return allDocuments.value.filter(doc => doc.status === '待補件')
+    filtered = allDocuments.value.filter(doc => doc.status === '待補件')
   } else if (activeTab.value === '尚未上傳') {
-    return allDocuments.value.filter(doc => doc.status === '尚未上傳')
+    filtered = allDocuments.value.filter(doc => doc.status === '尚未上傳')
   }
-  return []
+  
+  // 排序邏輯
+  const sorted = [...filtered]
+  
+  if (sortBy.value === '狀態') {
+    // 按狀態排序：尚未上傳 > 待補件 > 已審核
+    const statusPriority = {
+      '尚未上傳': 1,
+      '待補件': 2,
+      '已審核': 3
+    }
+    sorted.sort((a, b) => {
+      const priorityDiff = statusPriority[a.status] - statusPriority[b.status]
+      if (priorityDiff !== 0) return priorityDiff
+      
+      // 相同狀態則按日期排序
+      if (a.deadline && b.deadline) {
+        return new Date(a.deadline) - new Date(b.deadline)
+      }
+      return 0
+    })
+  } else if (sortBy.value === '日期') {
+    // 按日期排序：越緊急的越上面
+    sorted.sort((a, b) => {
+      // 有deadline的優先
+      if (a.deadline && !b.deadline) return -1
+      if (!a.deadline && b.deadline) return 1
+      
+      // 兩個都有deadline，按日期排序
+      if (a.deadline && b.deadline) {
+        return new Date(a.deadline) - new Date(b.deadline)
+      }
+      
+      // 兩個都沒有deadline，按上傳日期排序（較新的在前）
+      if (a.uploadDate && b.uploadDate) {
+        return new Date(b.uploadDate) - new Date(a.uploadDate)
+      }
+      
+      return 0
+    })
+  }
+  
+  return sorted
 })
 
 const handleUpload = (doc) => {
@@ -49,6 +118,33 @@ const handleView = (doc) => {
         <h2>文件管理</h2>
         <p>追蹤所有文件的上傳與審核狀態</p>
       </header>
+      
+      <!-- 排序選擇器 -->
+      <div class="sort-section">
+        <label class="sort-label">排序方式：</label>
+        <div class="sort-buttons">
+          <button
+            v-for="option in sortOptions"
+            :key="option"
+            class="sort-btn"
+            :class="{ active: sortBy === option }"
+            @click="sortBy = option"
+          >
+            <svg v-if="option === '狀態'" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="6" x2="20" y2="6"/>
+              <line x1="4" y1="12" x2="16" y2="12"/>
+              <line x1="4" y1="18" x2="12" y2="18"/>
+            </svg>
+            <svg v-else viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            {{ option }}
+          </button>
+        </div>
+      </div>
 
       <div class="doc-tabs">
         <button
@@ -175,6 +271,64 @@ const handleView = (doc) => {
   margin: 0.35rem 0 0;
   color: #777;
   font-size: 0.95rem;
+}
+
+/* 排序區域 */
+.sort-section {
+  background: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.sort-label {
+  font-size: 0.9rem;
+  color: #2b2b3a;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sort-buttons {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.sort-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e6e6ee;
+  background: #fff;
+  color: #6b6b80;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+}
+
+.sort-btn svg {
+  stroke: currentColor;
+}
+
+.sort-btn:hover {
+  border-color: #9F35FF;
+  background: #faf5ff;
+}
+
+.sort-btn.active {
+  border-color: #9F35FF;
+  background: linear-gradient(135deg, #9F35FF, #b35aff);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(159, 53, 255, 0.3);
 }
 
 .doc-tabs {

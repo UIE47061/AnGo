@@ -1,7 +1,5 @@
 <script setup>
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
+import BottomNav from '@/components/BottomNav.vue'
 
 const stages = [
   { name: '委託成立', status: 'completed' },
@@ -11,10 +9,6 @@ const stages = [
   { name: '服務驗收完成', status: 'pending' },
   { name: '撥款完成', status: 'pending' }
 ]
-
-const goBack = () => {
-  router.back()
-}
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -43,7 +37,6 @@ const getStatusText = (status) => {
   <div class="phone">
     <div class="flow-page">
       <header>
-        <button @click="goBack" class="back-btn">&lt;</button>
         <h3>金流進度</h3>
       </header>
 
@@ -67,6 +60,8 @@ const getStatusText = (status) => {
         </div>
       </div>
     </div>
+
+    <BottomNav />
   </div>
 </template>
 

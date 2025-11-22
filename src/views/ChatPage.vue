@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import BottomNav from '@/components/BottomNav.vue'
+import { chatApi } from '@/api/chat'
 
-const router = useRouter()
 const messageInput = ref('')
+const isLoading = ref(false)
 const chatMessages = ref([
   {
     id: 1,
@@ -12,11 +13,7 @@ const chatMessages = ref([
   }
 ])
 
-const goBack = () => {
-  router.back()
-}
-
-const sendMessage = () => {
+const sendMessage = async () => {
   const text = messageInput.value.trim()
   if (!text) return
 
@@ -28,20 +25,78 @@ const sendMessage = () => {
   })
 
   messageInput.value = ''
+  isLoading.value = true
 
-  // Simulate bot response
-  setTimeout(() => {
+  try {
+    const res = await chatApi.sendAiMessage(text)
     chatMessages.value.push({
       id: Date.now() + 1,
       type: 'bot',
-      text: '稍等，我正在為您查詢...'
+      text: res.reply
     })
-  }, 450)
+  } catch (error) {
+    console.error(error)
+    chatMessages.value.push({
+      id: Date.now() + 1,
+      type: 'bot',
+      text: '抱歉，我現在無法回答您的問題，請稍後再試。'
+    })
+  } finally {
+    isLoading.value = false
+    scrollToBottom()
+  }
 }
 
-const quickSend = (text) => {
-  messageInput.value = text
-  sendMessage()
+const quickSend = async (text) => {
+  // Add user message
+  chatMessages.value.push({
+    id: Date.now(),
+    type: 'user',
+    text
+  })
+  
+  isLoading.value = true
+  let queryCode = ''
+  if (text === '查看文件進度') queryCode = 'document_status'
+  if (text === '查看金流') queryCode = 'payment_status'
+
+  try {
+    if (queryCode) {
+      const res = await chatApi.quickQuery(queryCode)
+      chatMessages.value.push({
+        id: Date.now() + 1,
+        type: 'bot',
+        text: res.reply
+      })
+    } else {
+      // Fallback to normal chat if not a quick query
+      const res = await chatApi.sendAiMessage(text)
+      chatMessages.value.push({
+        id: Date.now() + 1,
+        type: 'bot',
+        text: res.reply
+      })
+    }
+  } catch (error) {
+    console.error(error)
+    chatMessages.value.push({
+      id: Date.now() + 1,
+      type: 'bot',
+      text: '抱歉，查詢失敗，請稍後再試。'
+    })
+  } finally {
+    isLoading.value = false
+    scrollToBottom()
+  }
+}
+
+const scrollToBottom = () => {
+  setTimeout(() => {
+    const container = document.getElementById('chat-scroll')
+    if (container) {
+      container.scrollTop = container.scrollHeight
+    }
+  }, 100)
 }
 </script>
 
@@ -49,8 +104,7 @@ const quickSend = (text) => {
   <div class="phone">
     <div class="chat-page">
       <header>
-        <button @click="goBack" class="back-btn">&lt;</button>
-        <h3>對話</h3>
+        <h3>AI對話</h3>
       </header>
 
       <div class="chat-scroll" id="chat-scroll">
@@ -81,6 +135,8 @@ const quickSend = (text) => {
         <button @click="sendMessage" id="send-btn">送出</button>
       </div>
     </div>
+    
+    <BottomNav />
   </div>
 </template>
 
@@ -107,8 +163,10 @@ const quickSend = (text) => {
 .chat-page {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 3.6rem);
+  height: calc(100vh - 3.6rem);
   gap: 12px;
+  position: relative;
+  padding-bottom: 200px;
 }
 
 header {
@@ -142,8 +200,9 @@ header h3 {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow: auto;
+  overflow-y: auto;
   padding: 6px 2px;
+  margin-bottom: auto;
 }
 
 .message-wrapper {
@@ -179,7 +238,15 @@ header h3 {
 .quick-actions {
   display: flex;
   gap: 8px;
-  padding: 0 2px;
+  padding: 8px 2px;
+  background: #f5f5f7;
+  position: fixed;
+  bottom: 155px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 3rem);
+  max-width: 354px;
+  z-index: 15;
 }
 
 .quick-send {
@@ -201,16 +268,22 @@ header h3 {
 }
 
 .chat-input {
-  position: sticky;
-  bottom: 0;
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 3rem);
+  max-width: 354px;
   background: #fff;
   display: flex;
   gap: 8px;
   align-items: center;
-  padding: 12px 8px 20px;
+  padding: 12px;
   border-top: 1px solid #e6e6ee;
   border-radius: 12px;
   margin-bottom: 0;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 15;
 }
 
 .chat-input input {
