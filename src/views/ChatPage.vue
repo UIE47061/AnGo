@@ -14,6 +14,7 @@ const chatMessages = ref([
 ])
 
 const sendMessage = async () => {
+  if (isLoading.value) return
   const text = messageInput.value.trim()
   if (!text) return
 
@@ -77,6 +78,7 @@ const sendMessage = async () => {
 }
 
 const quickSend = async (text) => {
+  if (isLoading.value) return
   // Add user message
   chatMessages.value.push({
     id: Date.now(),
@@ -185,21 +187,22 @@ const scrollToBottom = () => {
       </div>
 
       <div class="quick-actions">
-        <button class="quick-send" @click="quickSend('查看文件進度')">
+        <button class="quick-send" @click="quickSend('查看文件進度')" :disabled="isLoading">
           查看文件進度
         </button>
-        <button class="quick-send" @click="quickSend('查看金流')">查看金流</button>
+        <button class="quick-send" @click="quickSend('查看金流')" :disabled="isLoading">查看金流</button>
       </div>
 
       <div class="chat-input">
         <input
           v-model="messageInput"
           type="text"
-          placeholder="輸入訊息..."
+          :placeholder="isLoading ? '安行助理正在思考中...' : '輸入訊息...'"
           @keyup.enter="sendMessage"
+          :disabled="isLoading"
           aria-label="輸入訊息"
         />
-        <button @click="sendMessage" id="send-btn">送出</button>
+        <button @click="sendMessage" id="send-btn" :disabled="isLoading">送出</button>
       </div>
     </div>
     
@@ -381,6 +384,21 @@ header h3 {
 
 #send-btn:hover {
   background: #7a1fd9;
+}
+
+#send-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.quick-send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.chat-input input:disabled {
+  background: #f5f5f7;
+  cursor: not-allowed;
 }
 
 .typing-indicator {
